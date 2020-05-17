@@ -1,3 +1,4 @@
+# SpringBoot整合Mybatis-Plus多数据源
 ## 原理
 - 复写spring的AbstractDataSource#getConnection等方法，可以获取指定的数据库连接（connection）
 - 这样就可以切换到不同的数据源的不同的connect连接
