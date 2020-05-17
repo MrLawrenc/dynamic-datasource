@@ -1,7 +1,7 @@
 ## 原理
 - 复写spring的AbstractDataSource#getConnection等方法，可以获取指定的数据库连接（connection）
 - 这样就可以切换到不同的数据源的不同的connect连接
-- [完整源码]()
+- [完整源码](https://github.com/MrLawrenc/dynamic-datasource)
 ## 实战
 ### 引入mybatis-plus动态数据源相关包
 - 动态数据源
