@@ -144,7 +144,7 @@ spring:
     dynamic:
       datasource:
         master:
-          url: jdbc:mysql://47.96.158.220:13306/study?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
+          url: jdbc:mysql://ip1:port1/study?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
           username: root
           password: "@123lmyLMY."
           driver-class-name: com.mysql.cj.jdbc.Driver
