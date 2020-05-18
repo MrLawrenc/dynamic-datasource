@@ -1,4 +1,4 @@
-package com.swust.dynamicdatabasemigration;
+package com.swust.dynamicdatabasemigration.config;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import org.springframework.context.annotation.Bean;

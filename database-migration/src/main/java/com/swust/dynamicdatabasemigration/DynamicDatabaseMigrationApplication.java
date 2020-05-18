@@ -11,4 +11,5 @@ public class DynamicDatabaseMigrationApplication {
         SpringApplication.run(DynamicDatabaseMigrationApplication.class, args);
     }
 
+
 }
