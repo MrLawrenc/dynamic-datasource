@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+    dynamic:
+      #      SQL性能分析插件
+      p6spy: true
+      druid:
+        filters: stat
+      datasource:
+        master:
+          url: jdbc:mysql://47.96.158.220:13306/study?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
+          username: root
+          password: "@123lmyLMY."
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          druid: #这里可以重写默认值
+            initial-size: 2
+        master1:
+          url: jdbc:mysql://47.96.158.220:13306/study?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
+          username: root
+          password: "@123lmyLMY."
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          druid: #这里可以重写默认值
+            initial-size: 2
+#        lmy:
+#          url: jdbc:mysql://localhost:3306/study?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
+#          username: root
+#          password: admin
+#          driver-class-name: com.mysql.cj.jdbc.Driver
+#          druid: #这里可以重写默认值
+#            initial-size: 5
+logging:
+  level:
+    com.baomidou: debug
+
+
+##自定义文档目录
+#knife4j:
+#  markdowns: classpath:markdown/*

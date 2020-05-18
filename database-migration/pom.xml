@@ -11,7 +11,7 @@
     <groupId>com.swust</groupId>
     <artifactId>database-migration</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>dynamic-database-migration</name>
+    <name>database-migration</name>
     <description>database-migration tool</description>
 
     <properties>
