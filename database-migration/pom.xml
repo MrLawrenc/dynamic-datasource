@@ -19,12 +19,13 @@
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.reflections/reflections -->
+
         <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>0.9.11</version>
+            <groupId>com.github.mrLawrenc</groupId>
+            <artifactId>mrLawrenc-tool-spring-boot-starter</artifactId>
+            <version>1.0.0-RELEASE</version>
         </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->
         <dependency>

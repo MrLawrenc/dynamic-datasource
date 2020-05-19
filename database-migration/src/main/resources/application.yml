@@ -35,16 +35,20 @@ spring:
           driver-class-name: com.mysql.cj.jdbc.Driver
           druid:
             initial-size: 2
-#        lmy:
-#          url: jdbc:mysql://localhost:3306/study?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
-#          username: root
-#          password: admin
-#          driver-class-name: com.mysql.cj.jdbc.Driver
-#          druid: #这里可以重写默认值
-#            initial-size: 5
+        lmy:
+          url: jdbc:mysql://localhost:3306/study?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
+          username: root
+          password: admin
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          druid: #这里可以重写默认值
+            initial-size: 5
 logging:
   level:
     com.baomidou: debug
+
+# 若invoker实现类没有加入spring容器，则可以通过配置的方式来扫描所有的invoker实现类
+filter:
+  basepkg: com.swust
 
 
 ##自定义文档目录
