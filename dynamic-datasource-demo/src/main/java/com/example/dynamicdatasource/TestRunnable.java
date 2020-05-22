@@ -1,8 +1,11 @@
 package com.example.dynamicdatasource;
 
 import lombok.SneakyThrows;
+import lombok.ToString;
+import org.nustaq.serialization.FSTConfiguration;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
@@ -16,27 +19,82 @@ import static java.util.stream.Collectors.toList;
  */
 public class TestRunnable {
 
+    static FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
 
     public static void main(String[] args) throws Exception {
-        testSubmit();
+        //testExecute();
+        //readTask4File();
+
+        testFst();
     }
+
+
+    public static void testFst() throws Exception {
+        MyPool myPool = new MyPool();
+        IntStream.range(0, 10).mapToObj(i -> new A(i, "sssas结果")).forEach(obj -> {
+            myPool.execute(() -> {
+                System.out.println("开始处理任务" + obj);
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                    obj.name = "我是新的值";
+                    System.out.println("任务结束" + obj);
+                } catch (InterruptedException e) {
+                    System.out.println("第" + obj.index + "个任务被中断");
+                }
+
+            });
+        });
+
+        List<Runnable> runnableList = myPool.shutdown();
+        TimeUnit.SECONDS.sleep(1);
+        System.out.println("剩余任务：" + runnableList.size() + "个任务");
+
+
+        byte[] barray = conf.asByteArray(runnableList.get(0));
+
+
+        MyRunnable runnable = (MyRunnable) conf.asObject(barray);
+        new MyPool().execute(runnable);
+
+        TimeUnit.DAYS.sleep(1);
+
+    }
+
+    /**
+     * 读取序列化文件，进行反序列化
+     */
+    public static void readTask4File() throws Exception {
+        FileInputStream fileIn = new FileInputStream("F:\\openSources\\dynamic-datasource\\dynamic-datasource-demo\\src\\main\\java\\com\\example\\dynamicdatasource\\employee.ser");
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+        MyRunnable runnable = (MyRunnable) in.readObject();
+        in.close();
+        fileIn.close();
+
+        new MyPool().execute(runnable);
+    }
+
 
     /**
      * 测试无返回值的任务
      */
     public static void testExecute() throws Exception {
         MyPool myPool = new MyPool();
-        IntStream.range(0, 10).forEach(i -> myPool.execute(() -> {
-            try {
-                System.out.println("第" + i + "个任务开始执行");
-                TimeUnit.MILLISECONDS.sleep(1100);
-                System.out.println("第" + i + "个任务执行完毕");
-            } catch (InterruptedException e) {
-                System.out.println("第" + i + "个任务被中断");
-            }
-        }));
+        IntStream.range(0, 10).mapToObj(i -> new A(i, "sssas结果")).forEach(obj -> {
+            myPool.execute(() -> {
+                System.out.println("开始处理任务" + obj);
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                    obj.name = "我是新的值";
+                    System.out.println("任务结束" + obj);
+                } catch (InterruptedException e) {
+                    System.out.println("第" + obj.index + "个任务被中断");
+                }
+
+            });
+        });
 
         List<Runnable> runnableList = myPool.shutdown();
+        TimeUnit.SECONDS.sleep(1);
         System.out.println("剩余任务：" + runnableList.size() + "个任务");
 
         FileOutputStream fileOut = new FileOutputStream("F:\\openSources\\dynamic-datasource\\dynamic-datasource-demo\\src\\main\\java\\com\\example\\dynamicdatasource\\employee.ser");
@@ -116,6 +174,30 @@ public class TestRunnable {
             return pool.shutdownNow();
         }
 
+        /**
+         * 等到正在执行的任务全部执行完毕再关闭线程池
+         */
+        public List<Runnable> shutdownUntilOver() throws Exception {
+            pool.shutdown();
+            BlockingQueue<Runnable> queue = pool.getQueue();
+            List<Runnable> result = new ArrayList<>(queue.size());
+            Runnable poll = queue.poll();
+            while (poll != null) {
+                result.add(poll);
+                poll = queue.poll();
+            }
+
+            while (true) {
+                if (pool.isTerminated()) {
+                    System.out.println("任务全部执行完毕,保存队列任务数量:" + result.size());
+                    break;
+                }
+                Thread.sleep(200);
+            }
+
+            return result;
+        }
+
 
     }
 
@@ -173,6 +255,20 @@ public class TestRunnable {
         @Override
         public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             return null;
+        }
+    }
+
+    /**
+     * 没有实现序列化接口会报错
+     */
+    @ToString
+    static class A implements Serializable {
+        public String name;
+        public int index;
+
+        public A(int index, String name) {
+            this.index = index;
+            this.name = name;
         }
     }
 }
