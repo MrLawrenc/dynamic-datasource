@@ -21,7 +21,7 @@ import java.util.Set;
  */
 @RestController
 @AllArgsConstructor
-@Api("数据源操作相关接口")
+@Api(tags = "数据源操作相关接口")
 public class DataSourceController {
 
     private final DataSource dataSource;

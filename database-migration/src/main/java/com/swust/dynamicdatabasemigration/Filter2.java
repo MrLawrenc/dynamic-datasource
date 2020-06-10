@@ -14,17 +14,17 @@ public class Filter2 extends OutboundFilter {
 
     @Override
     public void init(Config filterConfig) {
-
+        System.out.println("out init");
     }
 
     @Override
     public void destroy() {
-
+        System.out.println("out destroy");
     }
 
     @Override
     public FilterChain doOutboundFilter(Response response, FilterChain chain) {
-        System.out.println("do f2...");
+        System.out.println("do out f2...");
         return chain;
     }
 }

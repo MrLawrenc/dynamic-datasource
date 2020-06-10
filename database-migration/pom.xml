@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.github.mrLawrenc</groupId>
             <artifactId>mrLawrenc-tool-spring-boot-starter</artifactId>
-            <version>1.0.0-RELEASE</version>
+            <version>1.0.1-RELEASE</version>
         </dependency>
 
 
@@ -67,12 +67,12 @@
             <artifactId>knife4j-spring-boot-starter</artifactId>
             <!--在引用时请在maven中央仓库搜索最新版本号-->
             <version>2.0.2</version>
-            <exclusions>
+<!--            <exclusions>
                 <exclusion>
                     <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
                 </exclusion>
-            </exclusions>
+            </exclusions>-->
         </dependency>
 
         <dependency>
@@ -117,16 +117,6 @@
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.swust</groupId>
-            <artifactId>database-migration</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.swust</groupId>
-            <artifactId>client</artifactId>
-            <version>2.0.0</version>
         </dependency>
     </dependencies>
 
