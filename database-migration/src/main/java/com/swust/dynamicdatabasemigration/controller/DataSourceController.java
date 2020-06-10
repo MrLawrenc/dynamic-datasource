@@ -1,5 +1,6 @@
 package com.swust.dynamicdatabasemigration.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.creator.*;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
@@ -8,10 +9,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -98,5 +102,26 @@ public class DataSourceController {
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
         ds.removeDataSource(name);
         return "删除成功";
+    }
+
+    @Autowired
+    private com.swust.dynamicdatabasemigration.controller.mapper.MyMapper MyMapper;
+    @Autowired
+    private DbInfo dbInfo;
+
+    @ApiOperation("获取表信息")
+    @GetMapping("/getTableInfo")
+    public String getUserInfo(String table) {
+        List<Map<String, String>> info = dbInfo.selectTableInfo("lmy", table);
+        return JSON.toJSONString(info);
+
+    }
+
+    @ApiOperation("获取所有表所有列信息")
+    @GetMapping("/getInfoAll")
+    public String getInfoAll(String table) {
+        List<Map<String, String>> info = MyMapper.infoAll();
+        return JSON.toJSONString(info);
+
     }
 }

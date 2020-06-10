@@ -24,6 +24,7 @@ public class ServiceImpl {
      */
     // @DS("lmy")
     public List<User> lmyList() {
+        //可以通过aop的方式实现数据源切换
         DynamicDataSourceContextHolder.push("lmy");
         List<User> users = userMapper.selectList(null);
         System.out.println(users);
