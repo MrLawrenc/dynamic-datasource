@@ -26,4 +26,5 @@ public interface DbInfo {
      * @return 当前表的信息
      */
     List<Map<String, String>> selectTableInfo(String datasource, String table);
+
 }

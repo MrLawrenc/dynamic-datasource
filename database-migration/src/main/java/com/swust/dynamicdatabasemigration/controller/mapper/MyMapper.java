@@ -1,8 +1,11 @@
 package com.swust.dynamicdatabasemigration.controller.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.swust.dynamicdatabasemigration.controller.TableInfo;
 import com.swust.dynamicdatabasemigration.controller.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -19,6 +22,13 @@ public interface MyMapper extends BaseMapper<User> {
 //    @Select("select * from information_schema.COLUMNS where TABLE_SCHEMA = (select database())")
     @Select("select * from information_schema.COLUMNS where TABLE_SCHEMA = (select database())  and TABLE_NAME=#{table} ")
     List<Map<String,String>> info(String table);
+
+    @Select("select * from information_schema.COLUMNS where TABLE_SCHEMA = (select database())  and TABLE_NAME=#{table} ")
+    @Results({
+            @Result(property = "tableCatalog", column = "TABLE_CATALOG"),
+            @Result(property = "dataType", column = "DATA_TYPE")
+    })
+    List<TableInfo> info0(String table);
 
     @Select("select * from information_schema.COLUMNS where TABLE_SCHEMA = (select database())")
     List<Map<String,String>> infoAll();

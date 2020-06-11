@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.creator.*;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
+import com.swust.dynamicdatabasemigration.controller.mapper.TableMapper;
 import com.swust.dynamicdatabasemigration.entity.dto.DataSourceDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +19,8 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author : hz20035009-逍遥
@@ -108,12 +112,26 @@ public class DataSourceController {
     private com.swust.dynamicdatabasemigration.controller.mapper.MyMapper MyMapper;
     @Autowired
     private DbInfo dbInfo;
+    @Autowired
+    private TableMapper tableMapper;
 
     @ApiOperation("获取表信息")
     @GetMapping("/getTableInfo")
-    public String getUserInfo(String table) {
-        List<Map<String, String>> info = dbInfo.selectTableInfo("lmy", table);
-        return JSON.toJSONString(info);
+    public String getUserInfo(String table) throws InterruptedException {
+        CompletableFuture.runAsync(() -> {
+            DynamicDataSourceContextHolder.push("lmy");
+            List<Map<String, String>> info1 = dbInfo.selectTableInfo("lmy", table);
+            info1.forEach(System.out::println);
+        });
+
+        DynamicDataSourceContextHolder.push("master");
+        List<Map<String, String>> info2 = dbInfo.selectTableInfo("master","temp");
+        TimeUnit.SECONDS.sleep(3);
+        System.out.println();
+
+        List<User> users = tableMapper.selectList(null);
+        List<TableInfo> infoList = MyMapper.info0("user");
+        return JSON.toJSONString(info2);
 
     }
 
