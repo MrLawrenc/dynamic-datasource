@@ -40,7 +40,7 @@ public class CoreBossEventLoop {
     @PostConstruct
     public void init() {
         this.wheelTimer = new HashedWheelTimer(
-                new ThreadFactoryBuilder().setNameFormat(" hashed-wheel-timer-%d").build(),
+                new ThreadFactoryBuilder().setNameFormat("hashed-wheel-timer-%d").build(),
                 timerConfig.getTickDuration(),
                 TimeUnit.SECONDS,
                 timerConfig.getTicksPerWheel());

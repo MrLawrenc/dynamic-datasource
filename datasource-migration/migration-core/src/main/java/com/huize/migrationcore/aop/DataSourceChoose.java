@@ -30,7 +30,6 @@ public class DataSourceChoose {
     @Around("intercept()")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        Object[] args = joinPoint.getArgs();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 
         //被代理对象

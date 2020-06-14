@@ -17,7 +17,7 @@ public class TableInfoService {
     @Autowired
     private TableMapper tableMapper;
 
-    @DataSourceSwitch("tableName")
+    @DataSourceSwitch("lmy")
     public List<Map<String, String>> info(String tableName) {
         List<Map<String, String>> user = tableMapper.info("user");
         System.out.println(user);
