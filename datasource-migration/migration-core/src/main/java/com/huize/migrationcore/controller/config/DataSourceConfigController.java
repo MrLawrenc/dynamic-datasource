@@ -1,4 +1,4 @@
-package com.huize.migrationcore.controller;
+package com.huize.migrationcore.controller.config;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;

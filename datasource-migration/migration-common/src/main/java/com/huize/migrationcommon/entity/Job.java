@@ -24,6 +24,7 @@ public class Job {
 
     private String sourceName;
     private String targetName;
+    private String tableName;
 
     /**
      * 查询条件,指where后的子句
