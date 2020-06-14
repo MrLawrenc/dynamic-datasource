@@ -36,6 +36,7 @@ public interface TableMapper {
     @Select("select * from information_schema.COLUMNS where TABLE_SCHEMA = (select database())  and TABLE_NAME=#{table} ")
     List<Map<String, String>> info(String table);
 
+
     @Select("select * from information_schema.COLUMNS where TABLE_SCHEMA = (select database())")
     List<Map<String, String>> infoAll();
 

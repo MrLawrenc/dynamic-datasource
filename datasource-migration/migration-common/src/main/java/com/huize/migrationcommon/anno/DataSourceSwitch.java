@@ -1,4 +1,4 @@
-package com.huize.migrationcore.anno;
+package com.huize.migrationcommon.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * 标记为需要数据源拦截的aop切面，进行动态数据源切换
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ElementType.METHOD})
 public @interface DataSourceSwitch {
 
     /**

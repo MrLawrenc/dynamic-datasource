@@ -4,8 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.creator.*;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.huize.migrationcommon.entity.DataSourceInfo;
 import com.huize.migrationcommon.mapper.TableMapper;
-import com.huize.migrationcore.entity.DataSourceDTO;
+import com.huize.migrationreader.service.TableInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sql.DataSource;
 import java.util.Set;
 
 
@@ -28,7 +28,7 @@ import java.util.Set;
 @Api(tags = "数据源相关配置")
 public class DataSourceConfigController {
 
-    private final DataSource dataSource;
+    private final javax.sql.DataSource dataSource;
     private final DataSourceCreator dataSourceCreator;
     private final BasicDataSourceCreator basicDataSourceCreator;
     private final JndiDataSourceCreator jndiDataSourceCreator;
@@ -38,12 +38,20 @@ public class DataSourceConfigController {
 
     @Autowired
     private TableMapper mapper;
+    @Autowired
+    private TableInfoService infoService;
 
 
     @GetMapping("/getTableInfo")
     @ApiOperation("获取表信息（测试方法）")
     public String test() {
-        return JSON.toJSONString(mapper.infoAll());
+        return JSON.toJSONString(infoService.info("user"));
+    }
+
+    @GetMapping("/datasource")
+    @ApiOperation("手动指定数据源")
+    public String datasource(String datasource) {
+        return JSON.toJSONString(infoService.info(datasource, "user"));
     }
 
     @GetMapping
@@ -55,24 +63,24 @@ public class DataSourceConfigController {
 
     @PostMapping("/add")
     @ApiOperation("通用添加数据源（推荐）")
-    public Set<String> add(@Validated @RequestBody DataSourceDTO dto) {
+    public Set<String> add(@Validated @RequestBody DataSourceInfo dto) {
         DataSourceProperty dataSourceProperty = new DataSourceProperty();
         BeanUtils.copyProperties(dto, dataSourceProperty);
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
-        DataSource dataSource = dataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(dto.getPollName(), dataSource);
+        javax.sql.DataSource dataSource = dataSourceCreator.createDataSource(dataSourceProperty);
+        ds.addDataSource(dto.getName(), dataSource);
         return ds.getCurrentDataSources().keySet();
     }
 
 
     @PostMapping("/addBasic")
     @ApiOperation(value = "添加基础数据源", notes = "调用Springboot内置方法创建数据源，兼容1,2")
-    public Set<String> addBasic(@Validated @RequestBody DataSourceDTO dto) {
+    public Set<String> addBasic(@Validated @RequestBody DataSourceInfo dto) {
         DataSourceProperty dataSourceProperty = new DataSourceProperty();
         BeanUtils.copyProperties(dto, dataSourceProperty);
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
-        DataSource dataSource = basicDataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(dto.getPollName(), dataSource);
+        javax.sql.DataSource dataSource = basicDataSourceCreator.createDataSource(dataSourceProperty);
+        ds.addDataSource(dto.getName(), dataSource);
         return ds.getCurrentDataSources().keySet();
     }
 
@@ -80,30 +88,30 @@ public class DataSourceConfigController {
     @ApiOperation("添加JNDI数据源")
     public Set<String> addJndi(String pollName, String jndiName) {
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
-        DataSource dataSource = jndiDataSourceCreator.createDataSource(jndiName);
+        javax.sql.DataSource dataSource = jndiDataSourceCreator.createDataSource(jndiName);
         ds.addDataSource(pollName, dataSource);
         return ds.getCurrentDataSources().keySet();
     }
 
     @PostMapping("/addDruid")
     @ApiOperation("基础Druid数据源")
-    public Set<String> addDruid(@Validated @RequestBody DataSourceDTO dto) {
+    public Set<String> addDruid(@Validated @RequestBody DataSourceInfo dto) {
         DataSourceProperty dataSourceProperty = new DataSourceProperty();
         BeanUtils.copyProperties(dto, dataSourceProperty);
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
-        DataSource dataSource = druidDataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(dto.getPollName(), dataSource);
+        javax.sql.DataSource dataSource = druidDataSourceCreator.createDataSource(dataSourceProperty);
+        ds.addDataSource(dto.getName(), dataSource);
         return ds.getCurrentDataSources().keySet();
     }
 
     @PostMapping("/addHikariCP")
     @ApiOperation("基础HikariCP数据源")
-    public Set<String> addHikariCP(@Validated @RequestBody DataSourceDTO dto) {
+    public Set<String> addHikariCP(@Validated @RequestBody DataSourceInfo dto) {
         DataSourceProperty dataSourceProperty = new DataSourceProperty();
         BeanUtils.copyProperties(dto, dataSourceProperty);
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
-        DataSource dataSource = hikariDataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(dto.getPollName(), dataSource);
+        javax.sql.DataSource dataSource = hikariDataSourceCreator.createDataSource(dataSourceProperty);
+        ds.addDataSource(dto.getName(), dataSource);
         return ds.getCurrentDataSources().keySet();
     }
 
