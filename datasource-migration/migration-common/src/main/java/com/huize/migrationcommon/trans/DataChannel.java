@@ -18,15 +18,28 @@ import java.util.concurrent.locks.ReentrantLock;
 @Component
 public class DataChannel {
 
+
     private Lock monitor = new ReentrantLock();
 
+    /**
+     * 缓冲区已满
+     */
     private boolean full;
 
+    /**
+     * 最大容量
+     */
     private long maxSize;
 
+    /**
+     * 当前容量
+     */
     private long currentSize;
 
 
+    /**
+     * 数据存储结构
+     */
     private Map<String, List<Row>> buffer = new HashMap<>();
 
 
