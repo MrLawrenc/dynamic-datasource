@@ -1,10 +1,8 @@
 package com.huize.migrationcommon.mapper;
 
 import com.huize.migrationcommon.entity.TableInfo;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.mapping.ResultSetType;
 
 import java.util.List;
 import java.util.Map;
@@ -42,11 +40,13 @@ public interface TableMapper {
 
     /**
      * 通用条件查询
+     * 流式查询，后续更改为全响应式操作 r2dbc
      *
      * @param table     表
      * @param condition where 条件子句
      * @return 查询结果
      */
+    @Options(resultSetType = ResultSetType.FORWARD_ONLY, fetchSize = Integer.MIN_VALUE)
     @Select("select * from #{table} where #{condition} ")
     List<Map<String, String>> where(String table, String condition);
 
