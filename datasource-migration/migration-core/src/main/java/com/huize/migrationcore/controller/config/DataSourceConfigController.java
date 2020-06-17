@@ -54,6 +54,12 @@ public class DataSourceConfigController {
         return JSON.toJSONString(infoService.info(datasource, "user"));
     }
 
+    @GetMapping("/testStreamData")
+    @ApiOperation("测试数据库流使查询")
+    public void testStreamData() {
+        infoService.testStreamData();
+    }
+
     @GetMapping
     @ApiOperation("获取当前所有数据源")
     public Set<String> now() {

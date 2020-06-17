@@ -1,8 +1,11 @@
 package com.huize.migrationcommon.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.huize.migrationcommon.entity.TableInfo;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.mapping.ResultSetType;
+import org.apache.ibatis.session.ResultHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -50,4 +53,28 @@ public interface TableMapper {
     @Select("select * from #{table} where #{condition} ")
     List<Map<String, String>> where(String table, String condition);
 
+    /**
+     * 流式查询
+     */
+    @Select("select * from user")
+    @Options(resultSetType = ResultSetType.FORWARD_ONLY, fetchSize = 1000)
+    @ResultType(Map.class)
+    void getNeedSignOffUserCheckRecord(ResultHandler<Map<String, String>> handler);
+
+    @Select("select * from user")
+    @Options(resultSetType = ResultSetType.FORWARD_ONLY, fetchSize = 1000)
+    @ResultType(Map.class)
+    void getNeedSignOffUserCheckRecord(QueryWrapper wrapper, ResultHandler<Map<String, String>> handler);
+
+
+    /**
+     * 游标
+     *
+     * mapper方法执行完毕后连接就会关闭，因此会报错:java.lang.IllegalStateException: A Cursor is already closed.
+     *
+     * 解决:https://my.oschina.net/yidinghe/blog/3288508
+     */
+    @Options(resultSetType = ResultSetType.FORWARD_ONLY)
+    @Select("SELECT * FROM role ")
+    Cursor<Map<String, String>> cursorQueryDepartmentAll();
 }
