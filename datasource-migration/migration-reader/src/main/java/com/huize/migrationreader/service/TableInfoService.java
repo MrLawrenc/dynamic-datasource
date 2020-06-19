@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.huize.migrationcommon.anno.DataSourceSwitch;
 import com.huize.migrationcommon.mapper.TableMapper;
+import org.apache.ibatis.cursor.Cursor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,11 +35,17 @@ public class TableInfoService {
         return user;
     }
 
+    /**
+     * 来源是流是数据，放入缓冲，使用响应式流依次处理
+     */
     @DataSourceSwitch("lmy")
     @Transactional
     public void testStreamData() {
         QueryWrapper<Map<String, String>> queryWrapper = new QueryWrapper<>();
         tableMapper.getNeedSignOffUserCheckRecord(resultContext -> {
+
+            resultContext.isStopped();
+
             Map<String, String> checkRecordEntity = resultContext.getResultObject();
             System.out.println("每一条记录:" + JSON.toJSONString(checkRecordEntity));
         });
@@ -49,8 +56,12 @@ public class TableInfoService {
             System.out.println("每一条记录:" + JSON.toJSONString(checkRecordEntity));
         });
 
+
+        Cursor<Map<String, String>> maps = tableMapper.cursorQueryDepartmentAll();
         //必须保证连接未被关闭
-        for (Map<String, String> map : tableMapper.cursorQueryDepartmentAll()) {
+        for (Map<String, String> map : maps) {
+
+
             System.out.println("游标获取的每一条数据:" + JSON.toJSONString(map));
         }
 

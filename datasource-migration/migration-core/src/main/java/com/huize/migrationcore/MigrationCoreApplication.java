@@ -4,20 +4,13 @@ import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.strategy.LoadBalanceDynamicDataSourceStrategy;
-import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.huize.migrationcommon.Reader;
 import com.huize.migrationcommon.anno.DataSourceFlag;
-import com.huize.migrationcommon.entity.Command;
-import com.huize.migrationcommon.entity.Job;
-import com.huize.migrationcommon.entity.JobInfo;
-import com.huize.migrationcommon.entity.Row;
 import com.huize.migrationcommon.trans.DataChannel;
-import com.huize.migrationcore.entity.DataSourceConfig;
 import com.huize.migrationcore.schedule.CoreBossEventLoop;
 import com.huize.migrationcore.service.DataSourceService;
 import com.huize.migrationcore.service.JobInfoService;
 import com.huize.migrationcore.utils.GlobalMapping;
-import com.huize.migrationreader.MySqlReader;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +20,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @author hz20035009-逍遥
@@ -90,7 +77,7 @@ public class MigrationCoreApplication implements CommandLineRunner {
 
 
         //保存数据源映射关系
-        mapping.setSourceMap(dataSourceService.list().stream()
+     /*   mapping.setSourceMap(dataSourceService.list().stream()
                 .collect(Collectors.toMap(DataSourceConfig::getName, po -> po)));
 
         //保存数据源和reader、writer的映射关系
@@ -134,7 +121,7 @@ public class MigrationCoreApplication implements CommandLineRunner {
         });
 
         //
-        DynamicDataSourceContextHolder.clear();
+        DynamicDataSourceContextHolder.clear();*/
     }
 
     /**

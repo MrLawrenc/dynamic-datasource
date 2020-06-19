@@ -29,11 +29,6 @@
             <artifactId>migration-writer</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.huize</groupId>
-            <artifactId>migration-common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
 
 
         <!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->

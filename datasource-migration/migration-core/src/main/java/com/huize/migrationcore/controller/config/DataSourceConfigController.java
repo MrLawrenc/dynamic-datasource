@@ -36,30 +36,6 @@ public class DataSourceConfigController {
     private final HikariDataSourceCreator hikariDataSourceCreator;
 
 
-    @Autowired
-    private TableMapper mapper;
-    @Autowired
-    private TableInfoService infoService;
-
-
-    @GetMapping("/getTableInfo")
-    @ApiOperation("获取表信息（测试方法）")
-    public String test() {
-        return JSON.toJSONString(infoService.info("user"));
-    }
-
-    @GetMapping("/datasource")
-    @ApiOperation("手动指定数据源")
-    public String datasource(String datasource) {
-        return JSON.toJSONString(infoService.info(datasource, "user"));
-    }
-
-    @GetMapping("/testStreamData")
-    @ApiOperation("测试数据库流使查询")
-    public void testStreamData() {
-        infoService.testStreamData();
-    }
-
     @GetMapping
     @ApiOperation("获取当前所有数据源")
     public Set<String> now() {
@@ -127,6 +103,32 @@ public class DataSourceConfigController {
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
         ds.removeDataSource(name);
         return "删除成功";
+    }
+
+
+    /*============================================================================*/
+    @Autowired
+    private TableMapper mapper;
+    @Autowired
+    private TableInfoService infoService;
+
+
+    @GetMapping("/getTableInfo")
+    @ApiOperation("获取表信息（测试方法）")
+    public String test() {
+        return JSON.toJSONString(infoService.info("user"));
+    }
+
+    @GetMapping("/datasource")
+    @ApiOperation("手动指定数据源")
+    public String datasource(String datasource) {
+        return JSON.toJSONString(infoService.info(datasource, "user"));
+    }
+
+    @GetMapping("/testStreamData")
+    @ApiOperation("测试数据库流使查询")
+    public void testStreamData() {
+        infoService.testStreamData();
     }
 
 }

@@ -75,6 +75,6 @@ public interface TableMapper {
      * 解决:https://my.oschina.net/yidinghe/blog/3288508
      */
     @Options(resultSetType = ResultSetType.FORWARD_ONLY)
-    @Select("SELECT * FROM role ")
+    @Select("SELECT * FROM user ")
     Cursor<Map<String, String>> cursorQueryDepartmentAll();
 }
