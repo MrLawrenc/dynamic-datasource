@@ -2,7 +2,7 @@ package com.huize.migrationcommon;
 
 import com.huize.migrationcommon.entity.Command;
 import com.huize.migrationcommon.entity.Job;
-import com.huize.migrationcommon.entity.JobInfo;
+import com.huize.migrationcommon.entity.JobInfoConfig;
 
 /**
  * @author : MrLawrenc
@@ -12,13 +12,13 @@ public class JobBuilder {
     private final Job job = new Job();
 
 
-    public JobBuilder jobInfo(JobInfo jobInfo) {
-        job.setCron(jobInfo.getCron());
-        job.setLastDate(jobInfo.getLastTime());
-        job.setCondition(jobInfo.getWhereCondition());
-        job.setCron(jobInfo.getCron());
-        job.setSourceName(jobInfo.getSourceName());
-        job.setTargetName(jobInfo.getTargetName());
+    public JobBuilder jobInfo(JobInfoConfig jobInfoConfig) {
+        job.setCron(jobInfoConfig.getCron());
+        job.setLastDate(jobInfoConfig.getLastTime());
+        job.setCondition(jobInfoConfig.getSelectCondition());
+        job.setCron(jobInfoConfig.getCron());
+        job.setSourceName(jobInfoConfig.getSourceName());
+        job.setTargetName(jobInfoConfig.getTargetName());
         return this;
     }
 

@@ -13,4 +13,6 @@ public class TableInfo {
 
     private String tableCatalog;
     private String dataType;
+
+    //todo
 }

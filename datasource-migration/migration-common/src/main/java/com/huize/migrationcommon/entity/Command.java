@@ -26,7 +26,8 @@ public class Command {
      * 命令种类
      */
     public static enum CommandKind {
-        READ((byte) 1, "read data"), WRITE((byte) 2, "write data"), DELETE_BY_PRIMARY((byte) 3, "del by primary key");
+        READ((byte) 1, "read data"), WRITE((byte) 2, "write data"),
+        DELETE_BY_PRIMARY((byte) 3, "del by primary key");
 
         CommandKind(byte code, String desc) {
             this.code = code;

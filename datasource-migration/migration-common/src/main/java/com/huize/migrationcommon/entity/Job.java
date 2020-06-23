@@ -45,9 +45,16 @@ public class Job {
 
 
     private ExecuteResult<?> result;
-    //todo
+    //todo .......
+
+
 
     public static JobBuilder createBuilder() {
         return new JobBuilder();
     }
+
+    public static class Entry {
+
+    }
+
 }

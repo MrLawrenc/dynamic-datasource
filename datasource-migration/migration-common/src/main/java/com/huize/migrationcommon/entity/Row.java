@@ -24,8 +24,4 @@ public class Row {
      */
     private List<String> rowData;
 
-
-    public enum Type {
-        BAD, NULL, INT, LONG, DOUBLE, STRING, BOOL, DATE, BYTES
-    }
 }

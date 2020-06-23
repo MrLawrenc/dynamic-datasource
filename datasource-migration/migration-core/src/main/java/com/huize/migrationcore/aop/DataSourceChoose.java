@@ -3,6 +3,7 @@ package com.huize.migrationcore.aop;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.huize.migrationcommon.anno.DataSourceSwitch;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -20,6 +21,7 @@ import java.lang.reflect.Method;
  * 切换数据源
  */
 @Aspect
+@Slf4j
 @Component
 public class DataSourceChoose {
 
@@ -32,7 +34,6 @@ public class DataSourceChoose {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 
-        //被代理对象
         Object target = joinPoint.getTarget();
 
         Method method = signature.getMethod();
@@ -45,7 +46,7 @@ public class DataSourceChoose {
             }
             dataSource = sourceParam[0].toString();
         }
-
+        log.info("current datasource : {}", dataSource);
         DynamicDataSourceContextHolder.push(dataSource);
         try {
             return joinPoint.proceed();

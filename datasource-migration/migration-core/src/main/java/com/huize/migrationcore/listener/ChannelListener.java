@@ -44,16 +44,16 @@ public class ChannelListener {
     /**
      * 当前缓存最大字节容量
      */
-    private long max = Long.MAX_VALUE;
+    private final long max = Long.MAX_VALUE;
     /**
      * 每一行数据的“索引”作为key
      * 占用内存的大小作为value
      */
-    private Map<String, Long> indexBufferSizeMap = new HashMap<>();
+    private final Map<String, Long> indexBufferSizeMap = new HashMap<>();
 
-    private Lock monitor = new ReentrantLock();
+    private final Lock monitor = new ReentrantLock();
 
-    private Condition buffer = monitor.newCondition();
+    private final Condition buffer = monitor.newCondition();
 
     /**
      * 初始化数据流通道

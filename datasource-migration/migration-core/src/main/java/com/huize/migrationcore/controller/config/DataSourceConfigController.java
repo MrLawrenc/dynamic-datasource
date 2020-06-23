@@ -5,7 +5,7 @@ import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.creator.*;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
 import com.huize.migrationcommon.entity.DataSourceInfo;
-import com.huize.migrationcommon.mapper.TableMapper;
+import com.huize.migrationcommon.mapper.CommonMapper4Mysql;
 import com.huize.migrationreader.service.TableInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -108,7 +108,7 @@ public class DataSourceConfigController {
 
     /*============================================================================*/
     @Autowired
-    private TableMapper mapper;
+    private CommonMapper4Mysql mapper;
     @Autowired
     private TableInfoService infoService;
 

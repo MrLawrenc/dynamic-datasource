@@ -3,7 +3,8 @@ package com.huize.migrationreader.service;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.huize.migrationcommon.anno.DataSourceSwitch;
-import com.huize.migrationcommon.mapper.TableMapper;
+import com.huize.migrationcommon.entity.TableInfo;
+import com.huize.migrationcommon.mapper.CommonMapper4Mysql;
 import org.apache.ibatis.cursor.Cursor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,18 +20,18 @@ import java.util.Map;
 @Service
 public class TableInfoService {
     @Autowired
-    private TableMapper tableMapper;
+    private CommonMapper4Mysql commonMapper4Mysql;
 
-    @DataSourceSwitch("lmy")
-    public List<Map<String, String>> info(String tableName) {
-        List<Map<String, String>> user = tableMapper.info("user");
+    @DataSourceSwitch("master")
+    public List<TableInfo> info(String tableName) {
+        List<TableInfo> user = commonMapper4Mysql.tableInfoList("user");
         System.out.println(user);
         return user;
     }
 
     @DataSourceSwitch()
-    public List<Map<String, String>> info(String datasource, String tableName) {
-        List<Map<String, String>> user = tableMapper.info("user");
+    public List<TableInfo> info(String datasource, String tableName) {
+        List<TableInfo> user = commonMapper4Mysql.tableInfoList("user");
         System.out.println(user);
         return user;
     }
@@ -38,31 +39,22 @@ public class TableInfoService {
     /**
      * 来源是流是数据，放入缓冲，使用响应式流依次处理
      */
-    @DataSourceSwitch("lmy")
+    @DataSourceSwitch("other1")
     @Transactional
     public void testStreamData() {
         QueryWrapper<Map<String, String>> queryWrapper = new QueryWrapper<>();
-        tableMapper.getNeedSignOffUserCheckRecord(resultContext -> {
+        commonMapper4Mysql.streamsSelect("user", " 1=1 ", resultContext -> {
 
             resultContext.isStopped();
-
             Map<String, String> checkRecordEntity = resultContext.getResultObject();
-            System.out.println("每一条记录:" + JSON.toJSONString(checkRecordEntity));
+            System.out.println("handler result :" + JSON.toJSONString(checkRecordEntity));
         });
 
 
-        tableMapper.getNeedSignOffUserCheckRecord(queryWrapper, resultContext -> {
-            Map<String, String> checkRecordEntity = resultContext.getResultObject();
-            System.out.println("每一条记录:" + JSON.toJSONString(checkRecordEntity));
-        });
-
-
-        Cursor<Map<String, String>> maps = tableMapper.cursorQueryDepartmentAll();
+        Cursor<Map<String, String>> maps = commonMapper4Mysql.cursorQueryDepartmentAll();
         //必须保证连接未被关闭
         for (Map<String, String> map : maps) {
-
-
-            System.out.println("游标获取的每一条数据:" + JSON.toJSONString(map));
+            System.out.println("cursor result : " + JSON.toJSONString(map));
         }
 
     }

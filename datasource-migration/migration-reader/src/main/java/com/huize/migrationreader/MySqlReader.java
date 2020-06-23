@@ -1,6 +1,6 @@
 package com.huize.migrationreader;
 
-import com.huize.migrationcommon.Reader;
+import com.huize.migrationcommon.reader.Reader;
 import com.huize.migrationcommon.anno.DataSourceFlag;
 import com.huize.migrationcommon.entity.Command;
 import com.huize.migrationcommon.entity.ContextConfig;
@@ -15,7 +15,7 @@ import java.util.Map;
  * date   2020/6/11 17:38
  */
 @Component
-@DataSourceFlag(datasourceName = "mysql")
+@DataSourceFlag(datasourceName = "mysql_reader")
 public class MySqlReader implements Reader {
     @Override
     public Command command() {
@@ -28,6 +28,11 @@ public class MySqlReader implements Reader {
     }
 
     @Override
+    public List<String> columnInfo() {
+        return null;
+    }
+
+    @Override
     public List<Map<String, String>> read(Job job) {
         return null;
     }
@@ -35,5 +40,10 @@ public class MySqlReader implements Reader {
     @Override
     public void destroy(ContextConfig contextConfig) {
 
+    }
+
+    @Override
+    public List<String> tableConstruct() {
+        return null;
     }
 }

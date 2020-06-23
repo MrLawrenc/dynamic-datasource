@@ -1,6 +1,8 @@
 package com.huize.migrationcommon.anno;
 
 
+import com.huize.migrationcommon.reader.Reader;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,7 +13,7 @@ import java.lang.annotation.Target;
  * date  2020/6/13 23:17
  * <p>
  * 标记reader writer所属的数据源
- * @see com.huize.migrationcommon.Reader
+ * @see Reader
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
