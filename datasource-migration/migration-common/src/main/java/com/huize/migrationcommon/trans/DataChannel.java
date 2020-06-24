@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Data
 @Component
-public class DataChannel {
+public abstract class DataChannel {
 
 
     private Lock monitor = new ReentrantLock();
@@ -42,6 +42,28 @@ public class DataChannel {
      */
     private Map<String, List<Row>> buffer = new HashMap<>();
 
+    public void offer(String targetDatasourceName, String targetTableName, Map<String, String> row) {
+        monitor.lock();
+        try {
+            String[] values = row.values().toArray(new String[]{});
+            long size = 0;
+            for (String value : values) {
+                size += value.getBytes().length;
+            }
+
+            if ((currentSize + size) >= maxSize) {
+                //标记缓冲已满
+                this.full = true;
+                monitor.wait();
+            }
+
+            currentSize += size;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            monitor.unlock();
+        }
+    }
 
     //fix
     public void offer(String targetDatasourceName, String targetTableName, List<Row> rows, int rowSize) {
