@@ -19,14 +19,13 @@ public final class DataSourceUtil {
      *
      * @param dataSourceInfo    数据源信息
      * @param dataSourceCreator creator
-     * @param dataSourceRouting routing
      * @return 当前数据源所有key
      */
     public static DataSource addDataSource(DataSourceInfo dataSourceInfo, DataSourceCreator dataSourceCreator, DynamicRoutingDataSource ds) {
         DataSourceProperty dataSourceProperty = new DataSourceProperty();
         BeanUtils.copyProperties(dataSourceInfo, dataSourceProperty);
         DataSource dataSource = dataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(dataSourceInfo.getName(), dataSource);
+        ds.addDataSource(dataSourceInfo.getPoolName(), dataSource);
         return dataSource;
     }
 }

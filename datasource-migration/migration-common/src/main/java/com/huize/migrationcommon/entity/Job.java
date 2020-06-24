@@ -24,7 +24,8 @@ public class Job {
 
     private String sourceName;
     private String targetName;
-    private String tableName;
+    private String sourceTable;
+    private String targetTable;
 
     /**
      * 查询条件,指where后的子句
@@ -48,6 +49,10 @@ public class Job {
     //todo .......
 
 
+    /**
+     * 下一个任务，通常为关联表的任务
+     */
+    private Job nextJob;
 
     public static JobBuilder createBuilder() {
         return new JobBuilder();

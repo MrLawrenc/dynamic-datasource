@@ -4,6 +4,8 @@ import com.huize.migrationcommon.entity.Command;
 import com.huize.migrationcommon.entity.Job;
 import com.huize.migrationcommon.entity.JobInfoConfig;
 
+import java.util.Objects;
+
 /**
  * @author : MrLawrenc
  * date  2020/6/13 21:14
@@ -19,11 +21,22 @@ public class JobBuilder {
         job.setCron(jobInfoConfig.getCron());
         job.setSourceName(jobInfoConfig.getSourceName());
         job.setTargetName(jobInfoConfig.getTargetName());
+        job.setSourceTable(jobInfoConfig.getSourceTableName());
+        job.setTargetTable(jobInfoConfig.getTargetTableName());
         return this;
     }
 
     public JobBuilder command(Command.CommandKind kind, Command.OperationType operationType) {
         job.setCurrentCommand(new Command(kind, operationType));
+        return this;
+    }
+
+    public JobBuilder addLast(Job next) {
+        Job lastJob = job.getNextJob();
+        while (Objects.nonNull(lastJob)) {
+            lastJob = lastJob.getNextJob();
+        }
+
         return this;
     }
 

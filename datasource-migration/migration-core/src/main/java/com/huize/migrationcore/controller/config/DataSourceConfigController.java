@@ -50,7 +50,7 @@ public class DataSourceConfigController {
         BeanUtils.copyProperties(dto, dataSourceProperty);
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
         javax.sql.DataSource dataSource = dataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(dto.getName(), dataSource);
+        ds.addDataSource(dto.getPoolName(), dataSource);
         return ds.getCurrentDataSources().keySet();
     }
 
@@ -62,7 +62,7 @@ public class DataSourceConfigController {
         BeanUtils.copyProperties(dto, dataSourceProperty);
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
         javax.sql.DataSource dataSource = basicDataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(dto.getName(), dataSource);
+        ds.addDataSource(dto.getPoolName(), dataSource);
         return ds.getCurrentDataSources().keySet();
     }
 
@@ -82,7 +82,7 @@ public class DataSourceConfigController {
         BeanUtils.copyProperties(dto, dataSourceProperty);
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
         javax.sql.DataSource dataSource = druidDataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(dto.getName(), dataSource);
+        ds.addDataSource(dto.getPoolName(), dataSource);
         return ds.getCurrentDataSources().keySet();
     }
 
@@ -93,7 +93,7 @@ public class DataSourceConfigController {
         BeanUtils.copyProperties(dto, dataSourceProperty);
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
         javax.sql.DataSource dataSource = hikariDataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(dto.getName(), dataSource);
+        ds.addDataSource(dto.getPoolName(), dataSource);
         return ds.getCurrentDataSources().keySet();
     }
 

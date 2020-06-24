@@ -1,19 +1,23 @@
 package com.huize.migrationcore.entity;
 
-import com.huize.migrationcommon.entity.DataSourceInfo;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author : MrLawrenc
  * date  2020/6/13 23:27
  */
-@EqualsAndHashCode(callSuper = true)
-@Data
-public class DataSourceConfig extends DataSourceInfo {
+@Data@Accessors(chain = true)
+public class DataSourceConfig {
     private int id;
-    private Date createTime;
-    private Date updateTime;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+
+    private String name;
+    private String driverClassName;
+    private String url;
+    private String username;
+    private String password;
 }

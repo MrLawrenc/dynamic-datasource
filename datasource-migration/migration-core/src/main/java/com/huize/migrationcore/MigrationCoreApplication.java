@@ -1,7 +1,6 @@
 package com.huize.migrationcore;
 
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.strategy.LoadBalanceDynamicDataSourceStrategy;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
@@ -20,6 +19,7 @@ import com.huize.migrationcore.schedule.CoreContext;
 import com.huize.migrationcore.service.DataSourceService;
 import com.huize.migrationcore.service.JobInfoService;
 import com.huize.migrationcore.utils.DateUtil;
+import com.huize.migrationcore.utils.GlobalConstant;
 import com.huize.migrationcore.utils.GlobalMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
@@ -107,7 +107,7 @@ public class MigrationCoreApplication implements CommandLineRunner {
 
 
         //从数据库查找任务配置
-        DynamicDataSourceContextHolder.push("master");
+        DynamicDataSourceContextHolder.push(GlobalConstant.MASTER);
         List<JobInfoConfig> jobInfos = jobInfoService.list(new QueryWrapper<JobInfoConfig>().isNull("parent_id"));
         if (CollectionUtils.isEmpty(jobInfos)) {
             log.warn("No executable scheduled tasks");
@@ -116,31 +116,19 @@ public class MigrationCoreApplication implements CommandLineRunner {
 
         //任务初始化
         jobInfos.forEach(jobInfo -> {
-
+            Job job1 = buildJobChain(jobInfo);
 
             //添加第一波任务
             eventLoop.getWheelTimer().newTimeout(timeout -> {
 
-                        //根据父级任务获取所有关联表的子任务
-                        List<JobInfoConfig> childJobList = jobInfoService.list(new QueryWrapper<JobInfoConfig>().eq("parent_id", jobInfo.getId()));
 
-                        if (Objects.isNull(childJobList)) {
-                            log.info("single table ");
+                        Job job = buildJobChain(jobInfo);
 
-
-                        } else {
-                            log.info("mutilate table ");
-                        }
-
-
-                        Job job = Job.createBuilder()
-                                .jobInfo(jobInfo)
-                                .command(Command.CommandKind.READ, Command.OperationType.READER)
-                                .build();
 
                         Reader reader = mapping.getReaderMap().get(job.getSourceName());
                         Writer writer = mapping.getWriterMap().get(job.getSourceName());
 
+                        //表结构比对
                         if (reader.tableConstruct() != writer.tableConstruct()) {
                             log.error("");
                         }
@@ -148,6 +136,7 @@ public class MigrationCoreApplication implements CommandLineRunner {
                         //读取
                         List<Map<String, String>> list = reader.read(job);
 
+                        //写入缓存
                         channel.offer("lmy", "user", new ArrayList<Row>(), 1024);
 
                     }, DateUtil.parseCron4Delay(jobInfo.getCron()
@@ -172,12 +161,44 @@ public class MigrationCoreApplication implements CommandLineRunner {
         if (StringUtils.isEmpty(value)) {
             value = sourceFlag.datasourceName();
         }
-        Assert.isTrue(mapping.getSourceMap().containsKey(value),
+        /*Assert.isTrue(mapping.getSourceMap().containsKey(value),
                 String.format("current datasource(%s) map  not contains current reader datasource(%s)"
-                        , JSON.toJSONString(mapping.getSourceMap().keySet()), value));
+                        , JSON.toJSONString(mapping.getSourceMap().keySet()), value));*/
         return value;
     }
 
+
+    /**
+     * 构造job链
+     *
+     * @param parentJobConfig 顶层任务
+     * @return job链的头结点
+     */
+    public Job buildJobChain(JobInfoConfig parentJobConfig) {
+        Job parentJob = Job.createBuilder()
+                .jobInfo(parentJobConfig)
+                .command(Command.CommandKind.READ, Command.OperationType.READER)
+                .build();
+
+        //根据父级任务获取所有关联表的子任务
+        List<JobInfoConfig> childJobList = jobInfoService.list(new QueryWrapper<JobInfoConfig>().eq("category", parentJobConfig.getId()));
+
+        Map<Integer, JobInfoConfig> jobInfoConfigMap = childJobList.stream().collect(Collectors.toMap(JobInfoConfig::getParentId, job -> job));
+
+        Job currentJob = parentJob;
+        JobInfoConfig currentNode = jobInfoConfigMap.get(parentJobConfig.getId());
+        while (Objects.nonNull(currentNode)) {
+            Job temp = Job.createBuilder()
+                    .jobInfo(currentNode)
+                    .command(Command.CommandKind.READ, Command.OperationType.READER)
+                    .build();
+            currentJob.setNextJob(temp);
+
+            currentJob = temp;
+            currentNode = jobInfoConfigMap.get(currentNode.getId());
+        }
+        return parentJob;
+    }
 
     public String getHostAddr() {
         InetAddress address = null;
