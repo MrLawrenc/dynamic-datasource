@@ -3,7 +3,6 @@ package com.huize.migrationcore.listener;
 import com.huize.migrationcommon.entity.Job;
 import com.huize.migrationcommon.entity.Row;
 import com.huize.migrationcore.event.DealDoneEvent;
-import com.huize.migrationcore.event.ReceiveDataEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -134,10 +133,5 @@ public class ChannelListener {
         }
     }
 
-    /**
-     * 数据到达
-     */
-    @EventListener
-    public void decrease(ReceiveDataEvent receiveDataEvent) {
-    }
+
 }

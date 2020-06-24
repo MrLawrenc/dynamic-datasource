@@ -2,7 +2,6 @@ package com.huize.migrationcore.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -12,7 +11,6 @@ import java.util.List;
  * <p>
  * 数据处理完成之后会发送的事件,可用于writer完成之后更新缓存大小
  */
-@Component
 public class DealDoneEvent extends ApplicationEvent {
 
     /**

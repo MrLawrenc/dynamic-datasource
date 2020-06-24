@@ -2,6 +2,8 @@ package com.huize.migrationcore;
 
 import com.huize.migrationcommon.trans.DataChannel;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -17,7 +19,10 @@ import java.util.concurrent.locks.ReentrantLock;
 @Data
 @Component
 public class DataChannelDefaultImpl extends DataChannel {
-
+    @Autowired
+    private ApplicationEventPublisher publisher;
+    @Autowired
+    private DataDispatcher dataDispatcher;
 
     private Lock monitor = new ReentrantLock();
 
@@ -37,7 +42,6 @@ public class DataChannelDefaultImpl extends DataChannel {
     private long currentSize;
 
 
-
     public void offer(String targetDatasourceName, String targetTableName, Map<String, String> row) {
         monitor.lock();
         try {
@@ -54,6 +58,8 @@ public class DataChannelDefaultImpl extends DataChannel {
             }
 
             currentSize += size;
+            //推送数据
+            dataDispatcher.dispatcher();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
