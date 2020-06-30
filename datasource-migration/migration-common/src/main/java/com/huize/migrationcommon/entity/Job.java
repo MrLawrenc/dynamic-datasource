@@ -42,7 +42,7 @@ public class Job {
     private boolean delCondition;
 
 
-    private Command currentCommand;
+    private Command0 currentCommand;
 
 
     private ExecuteResult<?> result;

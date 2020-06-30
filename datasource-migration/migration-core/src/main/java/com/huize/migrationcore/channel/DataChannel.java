@@ -16,6 +16,10 @@ import java.util.Collection;
 public abstract class DataChannel {
 
 
-    public abstract void offer(Collection<String> row);
+    public abstract long offer(Collection<String> row);
+
+    public abstract boolean isFull();
+
+    public abstract boolean release(long idx);
 
 }

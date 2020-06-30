@@ -1,6 +1,6 @@
 package com.huize.migrationcommon;
 
-import com.huize.migrationcommon.entity.Command;
+import com.huize.migrationcommon.entity.Command0;
 import com.huize.migrationcommon.entity.Job;
 import com.huize.migrationcommon.entity.JobInfoConfig;
 
@@ -26,8 +26,8 @@ public class JobBuilder {
         return this;
     }
 
-    public JobBuilder command(Command.CommandKind kind) {
-        job.setCurrentCommand(new Command(kind));
+    public JobBuilder command(Command0 command0) {
+        job.setCurrentCommand(command0);
         return this;
     }
 

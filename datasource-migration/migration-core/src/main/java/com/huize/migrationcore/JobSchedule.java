@@ -1,5 +1,8 @@
 package com.huize.migrationcore;
 
+import com.github.mrLawrenc.filter.entity.Request;
+import com.github.mrLawrenc.filter.entity.Response;
+import com.github.mrLawrenc.filter.standard.Invoker;
 import com.huize.migrationcommon.entity.Job;
 import com.huize.migrationcommon.reader.Reader;
 import com.huize.migrationcommon.writer.Writer;
@@ -17,7 +20,7 @@ import java.util.Collection;
  */
 @Component
 @Slf4j
-public class JobSchedule {
+public class JobSchedule implements Invoker {
     @Autowired
     private GlobalMapping mapping;
     @Autowired
@@ -45,10 +48,18 @@ public class JobSchedule {
         Collection<String> row = reader.doRead();
 
         //加入缓存
-        channel.offer( row);
+        long offer = channel.offer(row);
 
 
         //写入
         writer.write(row);
+
+        //释放内存
+        boolean release = channel.release(offer);
+    }
+
+    @Override
+    public Response doInvoke(Request request) {
+        return null;
     }
 }

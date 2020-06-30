@@ -5,9 +5,10 @@ import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.strategy.LoadBalanceDynamicDataSourceStrategy;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.mrLawrenc.filter.config.EnableFilterAndInvoker;
 import com.huize.migrationcommon.WriterReader;
 import com.huize.migrationcommon.anno.DataSourceFlag;
-import com.huize.migrationcommon.entity.Command;
+import com.huize.migrationcommon.entity.Command0;
 import com.huize.migrationcommon.entity.Job;
 import com.huize.migrationcommon.entity.JobInfoConfig;
 import com.huize.migrationcommon.reader.Reader;
@@ -53,6 +54,7 @@ import java.util.stream.Collectors;
         "com.huize.migrationcommon.mapper",
         "com.huize.migrationreader.mapper",
         "com.huize.migrationwriter.mapper"})
+@EnableFilterAndInvoker
 public class MigrationCoreApplication implements CommandLineRunner {
 
     @Value("${server.port:8080}")
@@ -121,8 +123,6 @@ public class MigrationCoreApplication implements CommandLineRunner {
 
         //任务初始化
         jobInfos.forEach(jobInfo -> {
-            Job job1 = buildJobChain(jobInfo);
-
             //添加第一波任务
             eventLoop.getWheelTimer().newTimeout(timeout -> {
 
@@ -136,7 +136,6 @@ public class MigrationCoreApplication implements CommandLineRunner {
                     , TimeUnit.SECONDS);
         });
 
-        //
         DynamicDataSourceContextHolder.clear();
     }
 
@@ -169,7 +168,7 @@ public class MigrationCoreApplication implements CommandLineRunner {
     public Job buildJobChain(JobInfoConfig parentJobConfig) {
         Job parentJob = Job.createBuilder()
                 .jobInfo(parentJobConfig)
-                .command(Command.CommandKind.READER_READ)
+                .command(Command0.READ_WRITE_DEL)
                 .build();
 
         //根据父级任务获取所有关联表的子任务
@@ -182,7 +181,7 @@ public class MigrationCoreApplication implements CommandLineRunner {
         while (Objects.nonNull(currentNode)) {
             Job temp = Job.createBuilder()
                     .jobInfo(currentNode)
-                    .command(Command.CommandKind.READER_READ)
+                    .command(Command0.READ_WRITE_DEL)
                     .build();
             currentJob.setNextJob(temp);
 
