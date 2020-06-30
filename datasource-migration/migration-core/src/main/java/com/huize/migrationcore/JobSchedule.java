@@ -3,6 +3,7 @@ package com.huize.migrationcore;
 import com.github.mrLawrenc.filter.entity.Request;
 import com.github.mrLawrenc.filter.entity.Response;
 import com.github.mrLawrenc.filter.standard.Invoker;
+import com.huize.migrationcommon.entity.Command0;
 import com.huize.migrationcommon.entity.Job;
 import com.huize.migrationcommon.reader.Reader;
 import com.huize.migrationcommon.writer.Writer;
@@ -30,10 +31,21 @@ public class JobSchedule implements Invoker {
      * 提交任务
      *
      * @param job 具体的某一次任务
+     *            <p>
+     *            暂时读任务使用一个线程，写任务使用一个线程
      */
     public void submitJob(Job job) {
         Reader reader = mapping.getReaderMap().get(job.getSourceName());
         Writer writer = mapping.getWriterMap().get(job.getTargetName());
+
+        Command0 currentCommand = job.getCurrentCommand();
+        if (currentCommand == Command0.READ_WRITE) {
+
+        } else if (currentCommand == Command0.READ_WRITE_DEL) {
+
+        } else {
+            log.error("current command({}) not find ", currentCommand.getDesc());
+        }
 
 
         //step 1 表结构比对
@@ -47,7 +59,7 @@ public class JobSchedule implements Invoker {
         //实际读
         Collection<String> row = reader.doRead();
 
-        //加入缓存
+        //加入内存
         long offer = channel.offer(row);
 
 

@@ -32,7 +32,7 @@ public interface Reader extends WriterReader {
 
 
     /**
-     * 读取数据
+     * 预读取数据，会执行查询，但数据不会立马到达jvm内存
      *
      * @param job 任务信息
      * @return 结果集
