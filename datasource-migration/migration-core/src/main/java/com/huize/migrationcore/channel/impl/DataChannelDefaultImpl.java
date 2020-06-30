@@ -1,12 +1,13 @@
-package com.huize.migrationcore;
+package com.huize.migrationcore.channel.impl;
 
-import com.huize.migrationcommon.trans.DataChannel;
+import com.huize.migrationcore.DataDispatcher;
+import com.huize.migrationcore.channel.DataChannel;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.Collection;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -42,13 +43,15 @@ public class DataChannelDefaultImpl extends DataChannel {
     private long currentSize;
 
 
-    public void offer(String targetDatasourceName, String targetTableName, Map<String, String> row) {
+    /**
+     * @param row 每一行数据
+     */
+    public void offer(Collection<String> row) {
         monitor.lock();
         try {
-            String[] values = row.values().toArray(new String[]{});
             long size = 0;
-            for (String value : values) {
-                size += value.getBytes().length;
+            for (String s : row) {
+                size += s.getBytes().length;
             }
 
             if ((currentSize + size) >= maxSize) {

@@ -13,34 +13,43 @@ import lombok.Data;
 public class Command {
 
     private CommandKind kind;
-    private OperationType type;
     private Command next;
 
 
-    public Command(CommandKind kind, OperationType type) {
+    public Command(CommandKind kind) {
         this.kind = kind;
-        this.type = type;
     }
 
     /**
-     * 命令种类
+     * 操作具体命令
      */
     public static enum CommandKind {
-        READ((byte) 1, "read data"), WRITE((byte) 2, "write data"),
-        DELETE_BY_PRIMARY((byte) 3, "del by primary key");
+        /**
+         * 持有该命令的job会操作reader数据源，并进行查询操作
+         */
+        READER_READ((byte) 1, OperationType.READER)
+        /**
+         * 持有该命令的job会操作writer数据源，并进行写入操作
+         */
+        , WRITER_WRITE((byte) 2, OperationType.WRITEER)
+        /**
+         * 持有该命令的job会操作reader数据源，并根据主键进行删除操作
+         */
+        , READER_DELETE_BY_PRIMARY((byte) 3, OperationType.READER);
 
-        CommandKind(byte code, String desc) {
+        CommandKind(byte code, OperationType type) {
             this.code = code;
-            this.desc = desc;
+            this.type = type;
         }
 
         private byte code;
-        private String desc;
+
+        private OperationType type;
 
     }
 
     /**
-     * 操作 读/写 数据源
+     * 标记操作的数据源，包括 读/写 数据源
      */
     public static enum OperationType {
         WRITEER((byte) 1, "target is writer"), READER((byte) 2, "target is reader");

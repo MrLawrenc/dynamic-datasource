@@ -4,6 +4,7 @@ import com.huize.migrationcommon.anno.DataSourceFlag;
 import com.huize.migrationcommon.writer.Writer;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -16,5 +17,10 @@ public class MySqlWriter implements Writer {
     @Override
     public List<String> tableConstruct() {
         return null;
+    }
+
+    @Override
+    public void write(Collection<String> row) {
+
     }
 }

@@ -10,10 +10,9 @@ import com.huize.migrationcommon.anno.DataSourceFlag;
 import com.huize.migrationcommon.entity.Command;
 import com.huize.migrationcommon.entity.Job;
 import com.huize.migrationcommon.entity.JobInfoConfig;
-import com.huize.migrationcommon.entity.Row;
 import com.huize.migrationcommon.reader.Reader;
-import com.huize.migrationcommon.trans.DataChannel;
 import com.huize.migrationcommon.writer.Writer;
+import com.huize.migrationcore.channel.DataChannel;
 import com.huize.migrationcore.entity.DataSourceConfig;
 import com.huize.migrationcore.schedule.CoreContext;
 import com.huize.migrationcore.service.DataSourceService;
@@ -36,7 +35,10 @@ import org.springframework.util.StringUtils;
 import javax.sql.DataSource;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -77,6 +79,9 @@ public class MigrationCoreApplication implements CommandLineRunner {
 
     @Autowired
     private DataChannel channel;
+
+    @Autowired
+    private JobSchedule jobSchedule;
 
 
     public static void main(String[] args) {
@@ -121,23 +126,10 @@ public class MigrationCoreApplication implements CommandLineRunner {
             //添加第一波任务
             eventLoop.getWheelTimer().newTimeout(timeout -> {
 
-
                         Job job = buildJobChain(jobInfo);
 
-
-                        Reader reader = mapping.getReaderMap().get(job.getSourceName());
-                        Writer writer = mapping.getWriterMap().get(job.getSourceName());
-
-                        //表结构比对
-                        if (reader.tableConstruct() != writer.tableConstruct()) {
-                            log.error("");
-                        }
-
-                        //读取
-                        List<Map<String, String>> list = reader.read(job);
-
-                        //写入缓存
-                        channel.offer("lmy", "user", new ArrayList<Row>(), 1024);
+                        //提交任务到调度中心
+                        jobSchedule.submitJob(job);
 
                     }, DateUtil.parseCron4Delay(jobInfo.getCron()
                     , new Date())
@@ -177,7 +169,7 @@ public class MigrationCoreApplication implements CommandLineRunner {
     public Job buildJobChain(JobInfoConfig parentJobConfig) {
         Job parentJob = Job.createBuilder()
                 .jobInfo(parentJobConfig)
-                .command(Command.CommandKind.READ, Command.OperationType.READER)
+                .command(Command.CommandKind.READER_READ)
                 .build();
 
         //根据父级任务获取所有关联表的子任务
@@ -190,7 +182,7 @@ public class MigrationCoreApplication implements CommandLineRunner {
         while (Objects.nonNull(currentNode)) {
             Job temp = Job.createBuilder()
                     .jobInfo(currentNode)
-                    .command(Command.CommandKind.READ, Command.OperationType.READER)
+                    .command(Command.CommandKind.READER_READ)
                     .build();
             currentJob.setNextJob(temp);
 

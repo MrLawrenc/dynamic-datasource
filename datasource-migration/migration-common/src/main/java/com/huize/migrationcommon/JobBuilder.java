@@ -26,8 +26,8 @@ public class JobBuilder {
         return this;
     }
 
-    public JobBuilder command(Command.CommandKind kind, Command.OperationType operationType) {
-        job.setCurrentCommand(new Command(kind, operationType));
+    public JobBuilder command(Command.CommandKind kind) {
+        job.setCurrentCommand(new Command(kind));
         return this;
     }
 

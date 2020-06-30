@@ -5,6 +5,7 @@ import com.huize.migrationcommon.entity.Command;
 import com.huize.migrationcommon.entity.ContextConfig;
 import com.huize.migrationcommon.entity.Job;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -38,12 +39,7 @@ public interface Reader extends WriterReader {
      */
     List<Map<String, String>> read(Job job);
 
-
-    /**
-     * @param datasourceName 目标数据源名
-     * @param table          目标表名
-     */
-    void doRead(String datasourceName, String table);
+    Collection<String> doRead();
 
     boolean done();
 
