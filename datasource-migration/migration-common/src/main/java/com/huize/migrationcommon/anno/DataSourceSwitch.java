@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * 标记为需要数据源拦截的aop切面，进行动态数据源切换
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.METHOD})
 public @interface DataSourceSwitch {
 
     /**

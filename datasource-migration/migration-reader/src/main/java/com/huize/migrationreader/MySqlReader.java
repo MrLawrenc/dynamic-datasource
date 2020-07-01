@@ -1,6 +1,7 @@
 package com.huize.migrationreader;
 
-import com.huize.migrationcommon.anno.DataSourceFlag;
+import com.huize.migrationcommon.NotifyWriterListener;
+import com.huize.migrationcommon.anno.DataSourceSwitch;
 import com.huize.migrationcommon.entity.Command;
 import com.huize.migrationcommon.entity.ContextConfig;
 import com.huize.migrationcommon.entity.Job;
@@ -20,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * date   2020/6/11 17:38
  */
 @Component
-@DataSourceFlag(datasourceName = "mysql_reader")
+@DataSourceSwitch("mysql_reader")
 public class MySqlReader implements Reader {
 
     @Autowired
@@ -28,27 +29,34 @@ public class MySqlReader implements Reader {
     private AtomicBoolean done = new AtomicBoolean(false);
     private ResultContext<? extends Map<String, String>> resultContext;
 
+    private NotifyWriterListener listener;
+
     @Override
     public Command command() {
         return null;
     }
 
     @Override
-    public void init(ContextConfig contextConfig) {
-
+    public void init(ContextConfig contextConfig, NotifyWriterListener listener) {
+        this.listener = listener;
     }
 
 
     //预读取
     @Override
-    public List<Map<String, String>> read(Job job) {
-        mapper4Mysql.streamsSelect(job.getSourceTable(), job.getCondition(), resultContext -> this.resultContext = resultContext);
-        return null;
+    public void read(Job job) {
+        mapper4Mysql.streamsSelect(job.getSourceTable(), job.getCondition(), resultContext -> {
+            Map<String, String> rowMap = resultContext.getResultObject();
+            listener.sendData(rowMap.values());
+        });
     }
 
     //实际读取每一条记录
     @Override
     public Collection<String> doRead() {
+        if (resultContext.isStopped()) {
+            return null;
+        }
         return resultContext.getResultObject().values();
     }
 

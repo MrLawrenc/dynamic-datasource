@@ -1,13 +1,12 @@
 package com.huize.migrationcommon.reader;
 
+import com.huize.migrationcommon.NotifyWriterListener;
 import com.huize.migrationcommon.WriterReader;
 import com.huize.migrationcommon.entity.Command;
 import com.huize.migrationcommon.entity.ContextConfig;
 import com.huize.migrationcommon.entity.Job;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author : MrLawrenc
@@ -28,16 +27,16 @@ public interface Reader extends WriterReader {
      *
      * @param contextConfig 配置
      */
-    void init(ContextConfig contextConfig);
+    void init(ContextConfig contextConfig, NotifyWriterListener listener);
 
 
     /**
      * 预读取数据，会执行查询，但数据不会立马到达jvm内存
      *
      * @param job 任务信息
-     * @return 结果集
+     * @return 结果集大小
      */
-    List<Map<String, String>> read(Job job);
+    void read(Job job);
 
     Collection<String> doRead();
 

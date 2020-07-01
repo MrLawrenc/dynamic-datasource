@@ -6,14 +6,14 @@ import com.baomidou.dynamic.datasource.strategy.LoadBalanceDynamicDataSourceStra
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.mrLawrenc.filter.config.EnableFilterAndInvoker;
+import com.google.common.base.Preconditions;
 import com.huize.migrationcommon.WriterReader;
-import com.huize.migrationcommon.anno.DataSourceFlag;
+import com.huize.migrationcommon.anno.DataSourceSwitch;
 import com.huize.migrationcommon.entity.Command0;
 import com.huize.migrationcommon.entity.Job;
 import com.huize.migrationcommon.entity.JobInfoConfig;
 import com.huize.migrationcommon.reader.Reader;
 import com.huize.migrationcommon.writer.Writer;
-import com.huize.migrationcore.channel.DataChannel;
 import com.huize.migrationcore.entity.DataSourceConfig;
 import com.huize.migrationcore.schedule.CoreContext;
 import com.huize.migrationcore.service.DataSourceService;
@@ -21,15 +21,16 @@ import com.huize.migrationcore.service.JobInfoService;
 import com.huize.migrationcore.utils.DateUtil;
 import com.huize.migrationcore.utils.GlobalConstant;
 import com.huize.migrationcore.utils.GlobalMapping;
+import com.huize.migrationcore.utils.ProxyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -49,7 +50,7 @@ import java.util.stream.Collectors;
  */
 @SpringBootApplication(exclude = DruidDataSourceAutoConfigure.class)
 @Slf4j
-@ComponentScan(basePackages = {"com.huize.migrationcore", "com.huize"})
+@ComponentScan(basePackages = {"com.huize", "com.huize.migrationreader", "com.huize.migrationwriter"})
 @MapperScan({"com.huize.migrationcore.mapper",
         "com.huize.migrationcommon.mapper",
         "com.huize.migrationreader.mapper",
@@ -79,8 +80,6 @@ public class MigrationCoreApplication implements CommandLineRunner {
     @Autowired
     private GlobalMapping mapping;
 
-    @Autowired
-    private DataChannel channel;
 
     @Autowired
     private JobSchedule jobSchedule;
@@ -123,17 +122,17 @@ public class MigrationCoreApplication implements CommandLineRunner {
 
         //任务初始化
         jobInfos.forEach(jobInfo -> {
+            long delay = DateUtil.parseCron4Delay(jobInfo.getCron(), new Date());
+            log.info("job {} delay {} s", jobInfo.getId(), delay);
             //添加第一波任务
             eventLoop.getWheelTimer().newTimeout(timeout -> {
 
-                        Job job = buildJobChain(jobInfo);
+                Job job = buildJobChain(jobInfo);
 
-                        //提交任务到调度中心
-                        jobSchedule.submitJob(job);
+                //提交任务到调度中心
+                jobSchedule.submitJob(job);
 
-                    }, DateUtil.parseCron4Delay(jobInfo.getCron()
-                    , new Date())
-                    , TimeUnit.SECONDS);
+            }, delay, TimeUnit.SECONDS);
         });
 
         DynamicDataSourceContextHolder.clear();
@@ -146,11 +145,24 @@ public class MigrationCoreApplication implements CommandLineRunner {
      * @return 数据源key
      */
     private String getDataSourceKey(WriterReader writerReader) {
-        DataSourceFlag sourceFlag = writerReader.getClass().getAnnotation(DataSourceFlag.class);
-        Assert.notNull(sourceFlag, String.format("reader(%s) must have @DataSourceFlag ", writerReader.getClass()));
+        if (AopUtils.isAopProxy(writerReader)) {
+            log.info("current clz({}) is proxy obj", writerReader.getClass());
+            try {
+                if (AopUtils.isJdkDynamicProxy(writerReader)) {
+                    writerReader = (WriterReader) ProxyUtil.getJdkDynamicProxyTargetObject(writerReader);
+                } else {
+                    //cglib
+                    writerReader = (WriterReader) ProxyUtil.getCglibProxyTargetObject(writerReader);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        DataSourceSwitch sourceFlag = writerReader.getClass().getAnnotation(DataSourceSwitch.class);
+        Preconditions.checkNotNull(sourceFlag, String.format("reader(%s) must have @DataSourceFlag ", writerReader.getClass()));
         String value = sourceFlag.value();
         if (StringUtils.isEmpty(value)) {
-            value = sourceFlag.datasourceName();
+            value = sourceFlag.value();
         }
         /*Assert.isTrue(mapping.getSourceMap().containsKey(value),
                 String.format("current datasource(%s) map  not contains current reader datasource(%s)"

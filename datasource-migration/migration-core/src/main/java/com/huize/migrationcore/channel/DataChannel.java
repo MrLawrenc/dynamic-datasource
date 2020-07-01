@@ -11,8 +11,6 @@ import java.util.Collection;
  * <p>
  * 数据缓冲区
  */
-@Data
-@Component
 public abstract class DataChannel {
 
 
@@ -21,5 +19,7 @@ public abstract class DataChannel {
     public abstract boolean isFull();
 
     public abstract boolean release(long idx);
+
+    public abstract boolean release(long[] idx);
 
 }

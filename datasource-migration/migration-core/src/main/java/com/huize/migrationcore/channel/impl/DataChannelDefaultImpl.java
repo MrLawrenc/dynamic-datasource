@@ -94,5 +94,13 @@ public class DataChannelDefaultImpl extends DataChannel {
         return false;
     }
 
+    @Override
+    public boolean release(long[] idx) {
+        for (long l : idx) {
+            release(l);
+        }
+        return true;
+    }
+
 
 }

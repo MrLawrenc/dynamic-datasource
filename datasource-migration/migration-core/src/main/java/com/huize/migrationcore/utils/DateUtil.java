@@ -95,7 +95,7 @@ public final class DateUtil {
     public static long parseCron4Delay(String cron, Date lastDate) {
         CronSequenceGenerator generator = new CronSequenceGenerator(cron);
         Date nextDate = generator.next(lastDate);
-        return nextDate.getTime() - lastDate.getTime() / 1000;
+        return (nextDate.getTime() - lastDate.getTime()) / 1000;
     }
 
 }

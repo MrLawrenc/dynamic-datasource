@@ -1,8 +1,6 @@
 package com.huize.migrationcore;
 
-import com.github.mrLawrenc.filter.entity.Request;
-import com.github.mrLawrenc.filter.entity.Response;
-import com.github.mrLawrenc.filter.standard.Invoker;
+import com.alibaba.fastjson.JSON;
 import com.huize.migrationcommon.entity.Command0;
 import com.huize.migrationcommon.entity.Job;
 import com.huize.migrationcommon.reader.Reader;
@@ -13,7 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author hz20035009-逍遥
@@ -21,11 +22,13 @@ import java.util.Collection;
  */
 @Component
 @Slf4j
-public class JobSchedule implements Invoker {
+public class JobSchedule {
     @Autowired
     private GlobalMapping mapping;
     @Autowired
     private DataChannel channel;
+
+    private int writeMaxNum = 2;
 
     /**
      * 提交任务
@@ -35,43 +38,52 @@ public class JobSchedule implements Invoker {
      *            暂时读任务使用一个线程，写任务使用一个线程
      */
     public void submitJob(Job job) {
-        Reader reader = mapping.getReaderMap().get(job.getSourceName());
-        Writer writer = mapping.getWriterMap().get(job.getTargetName());
+        log.info("start job : {}", JSON.toJSONString(job));
+        CompletableFuture.runAsync(() -> {
 
-        Command0 currentCommand = job.getCurrentCommand();
-        if (currentCommand == Command0.READ_WRITE) {
+            Reader reader = mapping.getReaderMap().get(job.getSourceName());
+            Writer writer = mapping.getWriterMap().get(job.getTargetName());
 
-        } else if (currentCommand == Command0.READ_WRITE_DEL) {
-
-        } else {
-            log.error("current command({}) not find ", currentCommand.getDesc());
-        }
+            Command0 currentCommand = job.getCurrentCommand();
 
 
-        //step 1 表结构比对
-        if (reader.tableConstruct() != writer.tableConstruct()) {
-            log.error("");
-        }
+            //step 1 表结构比对
+            if (reader.tableConstruct() != writer.tableConstruct()) {
+                log.error("table construct not same");
+            }
 
-        //预读
-        reader.read(job);
+            List<Collection<String>> rowList = new ArrayList<>();
+            List<Long> idxList = new ArrayList<>();
+            reader.init(null, row -> {
 
-        //实际读
-        Collection<String> row = reader.doRead();
+                //数据到达回调通知
+                System.out.println("row:" + JSON.toJSONString(row));
+                //加入内存
+                long offer = channel.offer(row);
+                rowList.add(row);
+                idxList.add(offer);
 
-        //加入内存
-        long offer = channel.offer(row);
+                if (rowList.size()>=writeMaxNum){
+                    writer.write(rowList);
+                    //释放内存
+                    boolean release = channel.release(offer);
+                }
+
+            });
+
+            //正式读
+            reader.read(job);
 
 
-        //写入
-        writer.write(row);
+            reader.destroy(null);
 
-        //释放内存
-        boolean release = channel.release(offer);
+
+        }).whenComplete((v, t) -> {
+            if (t != null) {
+                t.printStackTrace();
+            }
+        });
     }
 
-    @Override
-    public Response doInvoke(Request request) {
-        return null;
-    }
+
 }

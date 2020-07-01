@@ -33,7 +33,7 @@ spring:
             initial-size: 1
             max-active: 2
         mysql_reader:
-          url: jdbc:mysql://47.96.158.220:13306/migration?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
+          url: jdbc:mysql://47.96.158.220:13306/study?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
           username: root
           password: "@123lmyLMY."
           driver-class-name: com.mysql.cj.jdbc.Driver
