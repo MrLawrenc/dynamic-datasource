@@ -3,7 +3,9 @@ package com.huize.migrationcore;
 import com.alibaba.fastjson.JSON;
 import com.huize.migrationcommon.entity.Command0;
 import com.huize.migrationcommon.entity.Job;
+import com.huize.migrationcommon.entity.TableInfo;
 import com.huize.migrationcommon.reader.Reader;
+import com.huize.migrationcommon.service.CommonService4Mysql;
 import com.huize.migrationcommon.writer.Writer;
 import com.huize.migrationcore.channel.DataChannel;
 import com.huize.migrationcore.utils.GlobalMapping;
@@ -28,7 +30,10 @@ public class JobSchedule {
     @Autowired
     private DataChannel channel;
 
-    private int writeMaxNum = 2;
+    @Autowired
+    private CommonService4Mysql service4Mysql;
+
+    private int writeMaxNum = 300;
 
     /**
      * 提交任务
@@ -40,9 +45,6 @@ public class JobSchedule {
     public void submitJob(Job job) {
         log.info("start job : {}", JSON.toJSONString(job));
         CompletableFuture.runAsync(() -> {
-            if (true) {
-                return;
-            }
             Reader reader = mapping.getReaderMap().get(job.getSourceName());
             Writer writer = mapping.getWriterMap().get(job.getTargetName());
 
@@ -50,27 +52,23 @@ public class JobSchedule {
 
 
             //step 1 表结构比对
-            reader.tableConstruct(job.getSourceTable());
-            writer.tableConstruct(job.getTargetTable());
+            List<TableInfo> readerInfo = reader.tableConstruct(job.getSourceTable());
+            List<TableInfo> writerInfo = writer.tableConstruct(job.getTargetTable());
 
 
-            List<Collection<String>> rowList = new ArrayList<>();
+            List<Collection<Object>> rowList = new ArrayList<>();
             List<Long> idxList = new ArrayList<>();
             reader.init(null, row -> {
-
                 //数据到达回调通知
-                System.out.println("row:" + JSON.toJSONString(row));
-
-                int[] changeDataIdx = new int[10];
-                Collection<String> currentRow = typeChange2Str(row, changeDataIdx);
 
                 //加入内存
-                long offer = channel.offer(currentRow);
-                rowList.add(currentRow);
+                long offer = channel.offer(row);
+                rowList.add(row);
                 idxList.add(offer);
 
                 if (rowList.size() >= writeMaxNum) {
-                    writer.write(rowList);
+                    writer.write(job.getTargetTable(), rowList);
+                    rowList.clear();
                     //释放内存
                     boolean release = channel.release(offer);
                 }

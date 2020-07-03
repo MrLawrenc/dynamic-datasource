@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.huize.migrationcommon.entity.DataSourceInfo;
 import com.huize.migrationcommon.entity.TableInfo;
 import com.huize.migrationcommon.mapper.CommonMapper4Mysql;
+import com.huize.migrationcommon.service.CommonService4Mysql;
 import com.huize.migrationreader.service.TableInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -137,6 +138,8 @@ public class DataSourceConfigController {
 
     @Autowired
     private CommonMapper4Mysql commonMapper4Mysql;
+    @Autowired
+    private CommonService4Mysql service4Mysql;
 
     @GetMapping("/save")
     @ApiOperation("测试数据库插入，查询当前数据库所有数据，之后并更改索引之后原样插入，参数为当前数据库最大索引")
@@ -144,8 +147,7 @@ public class DataSourceConfigController {
         DynamicDataSourceContextHolder.push("mysql_reader");
         List<Collection<Object>> rows = new ArrayList<>();
         //表结构信息,根据字段排序
-        List<TableInfo> infos = commonMapper4Mysql.tableInfoList("user");
-        infos.sort(Comparator.comparing(TableInfo::getColumnOrder));
+        List<TableInfo> infos = service4Mysql.tableInfoList("user");
 
 
         commonMapper4Mysql.streamsSelect("user", " 1=1 ", r -> {

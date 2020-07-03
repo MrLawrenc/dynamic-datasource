@@ -1,8 +1,5 @@
 package com.huize.migrationcore.channel;
 
-import lombok.Data;
-import org.springframework.stereotype.Component;
-
 import java.util.Collection;
 
 /**
@@ -14,7 +11,7 @@ import java.util.Collection;
 public abstract class DataChannel {
 
 
-    public abstract long offer(Collection<String> row);
+    public abstract long offer(Collection<Object> row);
 
     public abstract boolean isFull();
 

@@ -2,9 +2,13 @@ package com.huize.migrationreader;
 
 import com.huize.migrationcommon.NotifyWriterListener;
 import com.huize.migrationcommon.anno.DataSourceSwitch;
-import com.huize.migrationcommon.entity.*;
+import com.huize.migrationcommon.entity.Command;
+import com.huize.migrationcommon.entity.ContextConfig;
+import com.huize.migrationcommon.entity.Job;
+import com.huize.migrationcommon.entity.TableInfo;
 import com.huize.migrationcommon.mapper.CommonMapper4Mysql;
 import com.huize.migrationcommon.reader.Reader;
+import com.huize.migrationcommon.service.CommonService4Mysql;
 import org.apache.ibatis.session.ResultContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,6 +28,9 @@ public class MySqlReader implements Reader {
 
     @Autowired
     private CommonMapper4Mysql mapper4Mysql;
+    @Autowired
+    private CommonService4Mysql service4Mysql;
+
     private AtomicBoolean done = new AtomicBoolean(false);
     private ResultContext<? extends Map<String, String>> resultContext;
 
@@ -68,8 +75,9 @@ public class MySqlReader implements Reader {
     }
 
     @Override
-    public TableConstruct tableConstruct(String tableName) {
-        List<TableInfo> tableInfos = mapper4Mysql.tableInfoList(tableName);
-        return null;
+    public List<TableInfo> tableConstruct(String tableName) {
+        return service4Mysql.tableInfoList(tableName);
     }
+
+
 }

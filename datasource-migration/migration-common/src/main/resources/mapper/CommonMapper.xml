@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.huize.migrationcommon.mapper.CommonMapper4Mysql">
-        <insert id="save">
-        INSERT INTO ${table} VALUES<foreach collection="values" item="value" separator="," open="" close="">
+
+    <!--批量插入-->
+    <insert id="save">
+        INSERT INTO ${table} VALUES
+        <foreach collection="values" item="value" separator="," open="" close="">
             <foreach collection="value" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>

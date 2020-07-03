@@ -9,6 +9,7 @@ import org.apache.ibatis.session.ResultHandler;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,10 +69,12 @@ public interface CommonMapper4Mysql {
      * @param table     表
      * @param condition where 条件子句
      * @param handler   数据集，结果回调
+     *
+     *                  返回类型使用LinkedHashMap可以保证和列顺序一致
      */
     @Select("select * from ${table} where ${condition} ")
     @Options(statementType = StatementType.STATEMENT, resultSetType = ResultSetType.FORWARD_ONLY, fetchSize = Integer.MIN_VALUE)
-    @ResultType(Map.class)
+    @ResultType(LinkedHashMap.class)
     void streamsSelect(@Param("table") String table, @Param("condition") @NotEmpty String condition, ResultHandler<Map<String, Object>> handler);
 
 

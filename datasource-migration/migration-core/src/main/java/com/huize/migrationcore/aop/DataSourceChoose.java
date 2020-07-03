@@ -53,7 +53,7 @@ public class DataSourceChoose {
         //只切部分reader和writer方法
         DataSourceSwitch clzAnnotation = target.getClass().getAnnotation(DataSourceSwitch.class);
         if (Objects.nonNull(clzAnnotation)) {
-            if (!method.getName().contains("read") && !method.getName().contains("write")) {
+            if (method.getName().contains("init") ) {
                 log.info("current method({}) return", method);
                 return joinPoint.proceed();
             } else {

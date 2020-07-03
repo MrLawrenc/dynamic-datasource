@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface Writer extends WriterReader {
 
-    void write(List<Collection<String>> rows);
+    void write(String tableName,List<Collection<Object>> rows);
 }
