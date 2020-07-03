@@ -8,6 +8,7 @@ import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.session.ResultHandler;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,9 @@ public interface CommonMapper4Mysql {
     @Select("select * from information_schema.COLUMNS where TABLE_SCHEMA = (select database())  and TABLE_NAME=#{table} ")
     @Results({
             @Result(property = "tableCatalog", column = "TABLE_CATALOG"),
-            @Result(property = "dataType", column = "DATA_TYPE")
+            @Result(property = "dataType", column = "DATA_TYPE"),
+            @Result(property = "columnName", column = "COLUMN_NAME"),
+            @Result(property = "columnOrder",column = "ORDINAL_POSITION")
     })
     List<TableInfo> tableInfoList(String table);
 
@@ -41,11 +44,27 @@ public interface CommonMapper4Mysql {
     @Select("select * from information_schema.COLUMNS where TABLE_SCHEMA = (select database())")
     List<Map<String, String>> databaseInfo();
 
+    /**
+     * 获取数据库相关信息
+     *
+     * 表名不能使用预编译（#取值），会报错，替换为$取值
+     */
+/*    @Insert("<script>" +
+            "insert into #{table} values " +
+            "<foreach item=\"item\" index=\"index\" collection=\"values\" open=\"(\" separator=\",\" close=\")\">  \n" +
+
+          "  <foreach item=\"item1\" index=\"index1\" collection=\"#{item}\" open=\"(\" separator=\",\" close=\")\">   #{item1} </foreach>"+
+
+            "　　</foreach> "+
+
+            "</script>")*/
+   void save(@Param("table") String table,@Param("values") List<Collection<Object>> values);
 
     /**
      * 通用条件查询
      * 非预编译的流式查询，后续更改为全响应式操作 r2dbc
      *
+     * 结果集为map的情况会过滤掉为null的列的值
      * @param table     表
      * @param condition where 条件子句
      * @param handler   数据集，结果回调
@@ -53,7 +72,14 @@ public interface CommonMapper4Mysql {
     @Select("select * from ${table} where ${condition} ")
     @Options(statementType = StatementType.STATEMENT, resultSetType = ResultSetType.FORWARD_ONLY, fetchSize = Integer.MIN_VALUE)
     @ResultType(Map.class)
-    void streamsSelect(@Param("table") String table, @Param("condition") @NotEmpty String condition, ResultHandler<Map<String, String>> handler);
+    void streamsSelect(@Param("table") String table, @Param("condition") @NotEmpty String condition, ResultHandler<Map<String, Object>> handler);
+
+
+    //只能查列
+    @Select("select * from ${table} where ${condition} ")
+    @Options(statementType = StatementType.STATEMENT, resultSetType = ResultSetType.FORWARD_ONLY, fetchSize = Integer.MIN_VALUE)
+    @ResultType(String.class)
+    void streamsSelect1(@Param("table") String table, @Param("condition") @NotEmpty String condition, ResultHandler<String> handler);
 
 
     /**

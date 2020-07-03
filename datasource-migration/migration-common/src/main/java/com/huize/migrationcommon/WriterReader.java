@@ -1,6 +1,6 @@
 package com.huize.migrationcommon;
 
-import java.util.List;
+import com.huize.migrationcommon.entity.TableConstruct;
 
 /**
  * @author hz20035009-逍遥
@@ -10,8 +10,6 @@ public interface WriterReader {
 
     /**
      * 表结构信息
-     * <p>
-     * 暂时只比对表名
      */
-    List<String> tableConstruct();
+    TableConstruct tableConstruct(String tableName);
 }

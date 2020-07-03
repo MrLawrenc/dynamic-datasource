@@ -12,5 +12,5 @@ public interface NotifyWriterListener extends Listener {
     /**
      * 发送一行数据
      */
-    void sendData(Collection<String> row);
+    void sendData(Collection<Object> row);
 }

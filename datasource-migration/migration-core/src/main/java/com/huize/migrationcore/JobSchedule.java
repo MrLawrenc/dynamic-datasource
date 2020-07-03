@@ -40,7 +40,9 @@ public class JobSchedule {
     public void submitJob(Job job) {
         log.info("start job : {}", JSON.toJSONString(job));
         CompletableFuture.runAsync(() -> {
-
+            if (true) {
+                return;
+            }
             Reader reader = mapping.getReaderMap().get(job.getSourceName());
             Writer writer = mapping.getWriterMap().get(job.getTargetName());
 
@@ -48,9 +50,9 @@ public class JobSchedule {
 
 
             //step 1 表结构比对
-            if (reader.tableConstruct() != writer.tableConstruct()) {
-                log.error("table construct not same");
-            }
+            reader.tableConstruct(job.getSourceTable());
+            writer.tableConstruct(job.getTargetTable());
+
 
             List<Collection<String>> rowList = new ArrayList<>();
             List<Long> idxList = new ArrayList<>();
@@ -58,12 +60,16 @@ public class JobSchedule {
 
                 //数据到达回调通知
                 System.out.println("row:" + JSON.toJSONString(row));
+
+                int[] changeDataIdx = new int[10];
+                Collection<String> currentRow = typeChange2Str(row, changeDataIdx);
+
                 //加入内存
-                long offer = channel.offer(row);
-                rowList.add(row);
+                long offer = channel.offer(currentRow);
+                rowList.add(currentRow);
                 idxList.add(offer);
 
-                if (rowList.size()>=writeMaxNum){
+                if (rowList.size() >= writeMaxNum) {
                     writer.write(rowList);
                     //释放内存
                     boolean release = channel.release(offer);
@@ -83,6 +89,33 @@ public class JobSchedule {
                 t.printStackTrace();
             }
         });
+    }
+
+    /**
+     * 所有列类型转为String
+     *
+     * @param row           原始列
+     * @param changeDataIdx 需要改变类型的索引值
+     * @return str列
+     */
+    private Collection<String> typeChange2Str(Collection<Object> row, int[] changeDataIdx) {
+        int size = row.size();
+        List<String> newRow = new ArrayList<>(size);
+
+        int idx = 0;
+        int changeIdx = 0;
+        for (Object data : row) {
+            if (idx == changeDataIdx[changeIdx]) {
+
+            } else {
+                newRow.add(data.toString());
+            }
+
+            idx++;
+            changeIdx++;
+        }
+
+        return newRow;
     }
 
 

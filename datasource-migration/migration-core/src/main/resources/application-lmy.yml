@@ -9,6 +9,9 @@ mybatis-plus:
   configuration:
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+    # 若不开启，则使用map接收查询结果的时候会过滤掉null的列，进而导致结果集的数量有误（针对map接收结果集的情况）
+    call-setters-on-nulls: true
   global-config:
     db-config:
       id-type: auto
@@ -47,7 +50,6 @@ spring:
           driver-class-name: com.mysql.cj.jdbc.Driver
           druid:
             initial-size: 2
-
 logging:
   level:
     com.baomidou: debug

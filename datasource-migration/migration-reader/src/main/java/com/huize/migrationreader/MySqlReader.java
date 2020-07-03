@@ -2,9 +2,7 @@ package com.huize.migrationreader;
 
 import com.huize.migrationcommon.NotifyWriterListener;
 import com.huize.migrationcommon.anno.DataSourceSwitch;
-import com.huize.migrationcommon.entity.Command;
-import com.huize.migrationcommon.entity.ContextConfig;
-import com.huize.migrationcommon.entity.Job;
+import com.huize.migrationcommon.entity.*;
 import com.huize.migrationcommon.mapper.CommonMapper4Mysql;
 import com.huize.migrationcommon.reader.Reader;
 import org.apache.ibatis.session.ResultContext;
@@ -45,10 +43,8 @@ public class MySqlReader implements Reader {
     //预读取
     @Override
     public void read(Job job) {
-        mapper4Mysql.streamsSelect(job.getSourceTable(), job.getCondition(), resultContext -> {
-            Map<String, String> rowMap = resultContext.getResultObject();
-            listener.sendData(rowMap.values());
-        });
+        mapper4Mysql.streamsSelect(job.getSourceTable(), job.getCondition(),
+                resultContext -> listener.sendData(resultContext.getResultObject().values()));
     }
 
     //实际读取每一条记录
@@ -72,7 +68,8 @@ public class MySqlReader implements Reader {
     }
 
     @Override
-    public List<String> tableConstruct() {
+    public TableConstruct tableConstruct(String tableName) {
+        List<TableInfo> tableInfos = mapper4Mysql.tableInfoList(tableName);
         return null;
     }
 }

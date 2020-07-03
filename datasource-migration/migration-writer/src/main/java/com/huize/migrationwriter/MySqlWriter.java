@@ -2,6 +2,7 @@ package com.huize.migrationwriter;
 
 import com.alibaba.fastjson.JSON;
 import com.huize.migrationcommon.anno.DataSourceSwitch;
+import com.huize.migrationcommon.entity.TableConstruct;
 import com.huize.migrationcommon.writer.Writer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import java.util.List;
 @DataSourceSwitch("mysql_writer")
 public class MySqlWriter implements Writer {
     @Override
-    public List<String> tableConstruct() {
+    public TableConstruct tableConstruct(String tableName) {
         return null;
     }
 

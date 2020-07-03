@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.creator.*;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
+import com.google.common.collect.Lists;
 import com.huize.migrationcommon.entity.DataSourceInfo;
+import com.huize.migrationcommon.entity.TableInfo;
 import com.huize.migrationcommon.mapper.CommonMapper4Mysql;
 import com.huize.migrationreader.service.TableInfoService;
 import io.swagger.annotations.Api;
@@ -15,7 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -115,8 +119,8 @@ public class DataSourceConfigController {
 
     @GetMapping("/getTableInfo")
     @ApiOperation("获取表信息（测试方法）")
-    public String test() {
-        return JSON.toJSONString(infoService.info("user"));
+    public String test(String tableName) {
+        return JSON.toJSONString(infoService.info(tableName));
     }
 
     @GetMapping("/datasource")
@@ -131,4 +135,54 @@ public class DataSourceConfigController {
         infoService.testStreamData();
     }
 
+    @Autowired
+    private CommonMapper4Mysql commonMapper4Mysql;
+
+    @GetMapping("/save")
+    @ApiOperation("测试数据库插入，查询当前数据库所有数据，之后并更改索引之后原样插入，参数为当前数据库最大索引")
+    public void save(int maxIdx) {
+        DynamicDataSourceContextHolder.push("mysql_reader");
+        List<Collection<Object>> rows = new ArrayList<>();
+        //表结构信息,根据字段排序
+        List<TableInfo> infos = commonMapper4Mysql.tableInfoList("user");
+        infos.sort(Comparator.comparing(TableInfo::getColumnOrder));
+
+
+        commonMapper4Mysql.streamsSelect("user", " 1=1 ", r -> {
+            Map<String, Object> resultObject = r.getResultObject();
+            resultObject.put("id",maxIdx+ Integer.parseInt(resultObject.get("id").toString()));
+            List<Object> row = infos.stream().map(info -> {
+                String columnName = info.getColumnName();
+                return resultObject.get(columnName);
+            }).collect(Collectors.toList());
+            rows.add(row);
+        });
+        infoService.save("mysql_reader", "user", rows);
+        DynamicDataSourceContextHolder.clear();
+
+      /*  List<List<Object>> rows = new ArrayList<>();
+        int id=54;
+        for (int i = 0; i < 45; i++) {
+            List<Object> row = new ArrayList<>();
+            row.add(id++);
+            row.add("名字"+i);
+            row.add("pwd"+i);
+            row.add("real name"+i);
+            row.add("img");
+
+            row.add("2");
+            row.add(new java.sql.Date(System.currentTimeMillis()));
+            row.add(new java.sql.Date(System.currentTimeMillis()));
+            rows.add(row);
+        }
+
+        infoService.save("mysql_reader", "user", rows);*/
+    }
+
+    public static void main(String[] args) {
+        ArrayList<Object> objects = Lists.newArrayList();
+        objects.add(111);
+        objects.add(null);
+        System.out.println(objects.size());
+    }
 }
