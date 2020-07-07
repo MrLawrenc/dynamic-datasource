@@ -61,6 +61,10 @@ public interface CommonMapper4Mysql {
             "</script>")*/
    void save(@Param("table") String table,@Param("values") List<Collection<Object>> values);
 
+    boolean update(@Param("table")String table, @Param("primaryKey")String primaryKey,
+                   @Param("primaryValues")List<Object> primaryValues,
+                   @Param("columnNames")List<String> columnNames,
+                   @Param("rows")List<Collection<Object>> rows);
     /**
      * 通用条件查询
      * 非预编译的流式查询，后续更改为全响应式操作 r2dbc

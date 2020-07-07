@@ -43,17 +43,16 @@ public class DataSourceChoose {
     @Around("intercept() || methodIntercept()")
     //@Around(" methodIntercept()")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info("enter joinPoint");
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 
         Object target = joinPoint.getTarget();
 
         Method method = signature.getMethod();
-
+        log.info("enter joinPoint,clz:{} method:{}", target.getClass(), method.getName());
         //只切部分reader和writer方法
         DataSourceSwitch clzAnnotation = target.getClass().getAnnotation(DataSourceSwitch.class);
         if (Objects.nonNull(clzAnnotation)) {
-            if (method.getName().contains("init") ) {
+            if (method.getName().contains("init")) {
                 log.info("current method({}) return", method);
                 return joinPoint.proceed();
             } else {

@@ -2,6 +2,7 @@ package com.huize.migrationcommon.service;
 
 import com.huize.migrationcommon.entity.TableInfo;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -15,4 +16,11 @@ public interface CommonService4Mysql {
      * @return 根据列排好序的列信息
      */
     List<TableInfo> tableInfoList(String table);
+
+    boolean save(String table, List<Collection<Object>> values);
+
+    boolean update(String table, String primaryKey,
+                   List<Object> primaryValues,
+                   List<String> columnNames,
+                   List<Collection<Object>> columnValues);
 }

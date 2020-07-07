@@ -11,4 +11,48 @@
             </foreach>
         </foreach>
     </insert>
+
+    <!--根据主键更新-->
+    <!--
+    更新多行数据，且每行多个字段(此处根据主键更新)
+    UPDATE categories
+        SET
+        display_order = CASE id
+            WHEN 1 THEN 3
+            WHEN 2 THEN 4
+            WHEN 3 THEN 5
+        END,
+        title = CASE id
+            WHEN 1 THEN 'New Title 1'
+            WHEN 2 THEN 'New Title 2'
+            WHEN 3 THEN 'New Title 3'
+        END
+    WHERE id IN (1,2,3)
+    -->
+    <update id="update">
+        UPDATE ${table} SET
+        <foreach collection="columnNames" item="columnName" index="columnIdx" separator="END," open="" close="END">
+            #{columnName} = CASE #{primaryKey}
+<!--            <foreach collection="columnValues" item="columnValue" index="idx" separator="," open="" close="">
+                WHEN #{primaryValues[rowIdx]}  THEN #{columnValues[rowIdx]}
+            </foreach>-->
+<!--            <foreach collection="primaryValues" item="primaryValue" index="idx" separator="," open="" close="">
+                WHEN #{primaryValue}  THEN #{columnValues[idx]}
+            </foreach>-->
+            <foreach collection="rows" item="row" index="rowIdx" separator="," open="" close="">
+                #{index}
+                WHEN
+                <foreach collection="primaryValues" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+                #{[rowIdx]}
+
+                THEN #{row[columnIdx]}
+            </foreach>
+        </foreach>
+        WHERE #{primaryKey} IN
+        <foreach collection="primaryValues" item="primaryValue" separator="," open="(" close=")">
+            #{primaryValue}
+        </foreach>
+    </update>
 </mapper>

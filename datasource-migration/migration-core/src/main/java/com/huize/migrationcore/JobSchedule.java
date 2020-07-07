@@ -45,6 +45,9 @@ public class JobSchedule {
     public void submitJob(Job job) {
         log.info("start job : {}", JSON.toJSONString(job));
         CompletableFuture.runAsync(() -> {
+            if (true){
+                return;
+            }
             Reader reader = mapping.getReaderMap().get(job.getSourceName());
             Writer writer = mapping.getWriterMap().get(job.getTargetName());
 

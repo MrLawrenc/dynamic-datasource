@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -180,7 +181,32 @@ public class DataSourceConfigController {
 
         infoService.save("mysql_reader", "user", rows);*/
     }
+    @GetMapping("/testUpdate")
+    @ApiOperation("测试数据库更新")
+    public void testUpdate() {
+        DynamicDataSourceContextHolder.push("mysql_writer");
+        ArrayList<Object> primaryIds = new ArrayList<>();
+        primaryIds.add(1);
+        ArrayList<String> columnNames = new ArrayList<>();
+        columnNames.add("user_name");
+        columnNames.add("password");
+        columnNames.add("real_name");
+        columnNames.add("is_del");
+        columnNames.add("create_time");
+        columnNames.add("del_time");
+        ArrayList<Object> row = new ArrayList<>();
+        row.add("更新之后的名字");
+        row.add("更新之后的pwd");
+        row.add("更新之后的real_name");
+        row.add(1);
+        row.add(LocalDate.now());
+        row.add(LocalDate.now());
+        List<Collection<Object>> rows=new ArrayList<>();
+        rows.add(row);
 
+        service4Mysql.update("user","id",primaryIds,columnNames,rows);
+        infoService.testStreamData();
+    }
     public static void main(String[] args) {
         ArrayList<Object> objects = Lists.newArrayList();
         objects.add(111);

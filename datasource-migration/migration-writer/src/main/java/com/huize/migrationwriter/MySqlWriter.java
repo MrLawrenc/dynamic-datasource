@@ -1,9 +1,8 @@
 package com.huize.migrationwriter;
 
-import com.alibaba.fastjson.JSON;
 import com.huize.migrationcommon.anno.DataSourceSwitch;
+import com.huize.migrationcommon.entity.ContextConfig;
 import com.huize.migrationcommon.entity.TableInfo;
-import com.huize.migrationcommon.mapper.CommonMapper4Mysql;
 import com.huize.migrationcommon.service.CommonService4Mysql;
 import com.huize.migrationcommon.writer.Writer;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +21,6 @@ import java.util.List;
 @DataSourceSwitch("mysql_writer")
 public class MySqlWriter implements Writer {
 
-    @Autowired
-    private CommonMapper4Mysql commonMapper;
 
     @Autowired
     private CommonService4Mysql service4Mysql;
@@ -34,8 +31,13 @@ public class MySqlWriter implements Writer {
     }
 
     @Override
+    public void init(ContextConfig contextConfig) {
+        //获取当前操作表的所有主键数据
+
+    }
+
+    @Override
     public void write(String tableName, List<Collection<Object>> rows) {
-        log.info("write data : {}", JSON.toJSONString(rows));
-        commonMapper.save(tableName, rows);
+        service4Mysql.save(tableName,rows);
     }
 }
