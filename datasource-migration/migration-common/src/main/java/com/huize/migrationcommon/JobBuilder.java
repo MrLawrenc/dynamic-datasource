@@ -23,6 +23,7 @@ public class JobBuilder {
         job.setTargetName(jobInfoConfig.getTargetName());
         job.setSourceTable(jobInfoConfig.getSourceTableName());
         job.setTargetTable(jobInfoConfig.getTargetTableName());
+        job.setDbId(jobInfoConfig.getId());
         return this;
     }
 

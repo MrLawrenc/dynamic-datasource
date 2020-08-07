@@ -13,6 +13,7 @@ import java.util.Date;
  */
 @Data
 public class Job {
+    private Integer dbId;
     /**
      * cron 表达式
      */

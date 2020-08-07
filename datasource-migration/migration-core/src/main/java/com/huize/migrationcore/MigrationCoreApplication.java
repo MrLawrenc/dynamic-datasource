@@ -5,7 +5,7 @@ import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.strategy.LoadBalanceDynamicDataSourceStrategy;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.mrLawrenc.filter.config.EnableFilterAndInvoker;
+import com.github.mrlawrenc.filter.config.EnableFilterAndInvoker;
 import com.google.common.base.Preconditions;
 import com.huize.migrationcommon.WriterReader;
 import com.huize.migrationcommon.anno.DataSourceSwitch;
@@ -208,7 +208,7 @@ public class MigrationCoreApplication implements CommandLineRunner {
         try {
             address = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            log.error("get host error", e);
         }
         assert address != null;
         return address.getHostAddress();

@@ -1,13 +1,13 @@
 package com.huize.migrationcore;
 
 import com.alibaba.fastjson.JSON;
+import com.github.mrlawrenc.filter.entity.Response;
 import com.huize.migrationcommon.entity.Command0;
 import com.huize.migrationcommon.entity.Job;
-import com.huize.migrationcommon.entity.TableInfo;
 import com.huize.migrationcommon.reader.Reader;
-import com.huize.migrationcommon.service.CommonService4Mysql;
 import com.huize.migrationcommon.writer.Writer;
-import com.huize.migrationcore.channel.DataChannel;
+import com.huize.migrationcore.entity.JobContext;
+import com.huize.migrationcore.service.impl.JobHandlerImpl;
 import com.huize.migrationcore.utils.GlobalMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +25,13 @@ import java.util.concurrent.CompletableFuture;
 @Component
 @Slf4j
 public class JobSchedule {
+
+
+    @Autowired
+    private JobHandlerImpl jobHandler;
+
     @Autowired
     private GlobalMapping mapping;
-    @Autowired
-    private DataChannel channel;
-
-    @Autowired
-    private CommonService4Mysql service4Mysql;
-
-    private int writeMaxNum = 300;
 
     /**
      * 提交任务
@@ -45,44 +43,16 @@ public class JobSchedule {
     public void submitJob(Job job) {
         log.info("start job : {}", JSON.toJSONString(job));
         CompletableFuture.runAsync(() -> {
-            if (true){
-                return;
-            }
-            Reader reader = mapping.getReaderMap().get(job.getSourceName());
-            Writer writer = mapping.getWriterMap().get(job.getTargetName());
 
             Command0 currentCommand = job.getCurrentCommand();
 
+            Reader reader = mapping.getReaderMap().get(job.getSourceName());
+            Writer writer = mapping.getWriterMap().get(job.getTargetName());
+            Response response = jobHandler.doInvoke(new JobContext().setJob(job).setReader(reader).setWriter(writer));
 
-            //step 1 表结构比对
-            List<TableInfo> readerInfo = reader.tableConstruct(job.getSourceTable());
-            List<TableInfo> writerInfo = writer.tableConstruct(job.getTargetTable());
-
-
-            List<Collection<Object>> rowList = new ArrayList<>();
-            List<Long> idxList = new ArrayList<>();
-            reader.init(null, row -> {
-                //数据到达回调通知
-
-                //加入内存
-                long offer = channel.offer(row);
-                rowList.add(row);
-                idxList.add(offer);
-
-                if (rowList.size() >= writeMaxNum) {
-                    writer.write(job.getTargetTable(), rowList);
-                    rowList.clear();
-                    //释放内存
-                    boolean release = channel.release(offer);
-                }
-
-            });
-
-            //正式读
-            reader.read(job);
-
-
-            reader.destroy(null);
+            if (true) {
+                return;
+            }
 
 
         }).whenComplete((v, t) -> {

@@ -29,4 +29,17 @@ public class TableInfo {
     private int columnOrder;
 
     //todo
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TableInfo tableInfo = (TableInfo) o;
+        return columnOrder == tableInfo.columnOrder &&
+                tableCatalog.equals(tableInfo.tableCatalog) &&
+                dataType.equals(tableInfo.dataType) &&
+                columnName.equals(tableInfo.columnName);
+    }
+
 }

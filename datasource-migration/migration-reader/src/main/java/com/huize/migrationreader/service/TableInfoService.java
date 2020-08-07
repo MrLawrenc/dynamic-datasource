@@ -26,7 +26,6 @@ public class TableInfoService {
     @DataSourceSwitch("master")
     public List<TableInfo> info(String tableName) {
         List<TableInfo> user = commonMapper4Mysql.tableInfoList(tableName);
-        System.out.println(user);
         return user;
     }
 
@@ -42,7 +41,7 @@ public class TableInfoService {
     }
 
     /**
-     * 来源是流是数据，放入缓冲，使用响应式流依次处理
+     * 来源是流式数据，放入缓冲，使用响应式流依次处理
      */
     @DataSourceSwitch("mysql_reader")
     @Transactional
