@@ -39,11 +39,10 @@ public class HeadFilter extends InboundFilter<JobContext, Response> {
         List<TableInfo> writerInfo = writer.tableConstruct(job.getTargetTable());
         for (int i = 0; i < writerInfo.size(); i++) {
             if (!writerInfo.get(i).equals(readerInfo.get(i))) {
-
+                jobContext.getError().setContinue(false).setMsg("table info mismatch");
+                return chain.skip2Service();
             }
         }
-
-
         return chain;
     }
 

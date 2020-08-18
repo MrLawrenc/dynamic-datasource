@@ -22,11 +22,11 @@ public class JobContext extends Request {
     private Writer writer;
 
 
-    private Error error;
+    private Error error=new Error();
 
     @Data
     public static class Error {
-        private boolean isContinue;
+        private boolean isContinue=true;
         private String msg;
     }
 }
