@@ -1,21 +1,13 @@
 package com.huize.migrationcore.service.impl;
 
+import com.github.mrlawrenc.filter.entity.Request;
+import com.github.mrlawrenc.filter.entity.Response;
 import com.github.mrlawrenc.filter.standard.Invoker;
-import com.huize.migrationcommon.entity.Command0;
-import com.huize.migrationcommon.entity.Job;
-import com.huize.migrationcommon.reader.Reader;
 import com.huize.migrationcommon.service.CommonService4Mysql;
-import com.huize.migrationcommon.writer.Writer;
 import com.huize.migrationcore.channel.DataChannel;
-import com.huize.migrationcore.entity.JobContext;
-import com.huize.migrationcore.entity.JobExecResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author hz20035009-逍遥
@@ -25,7 +17,7 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class JobHandlerImpl implements Invoker<JobContext, JobExecResult> {
+public class JobHandlerImpl implements Invoker {
 
     @Autowired
     private DataChannel channel;
@@ -33,10 +25,11 @@ public class JobHandlerImpl implements Invoker<JobContext, JobExecResult> {
     @Autowired
     private CommonService4Mysql service4Mysql;
 
+
     @Override
-    public JobExecResult doInvoke(JobContext jobContext) {
-        log.info("start handle job id={}", jobContext.getJob());
-        Job job = jobContext.getJob();
+    public Response doInvoke(Request request) {
+      /*   log.info("start handle job id={}", jobContext.getJob());
+       Job job = jobContext.getJob();
 
         Reader reader = jobContext.getReader();
         Writer writer = jobContext.getWriter();
@@ -71,7 +64,7 @@ public class JobHandlerImpl implements Invoker<JobContext, JobExecResult> {
         if (currentCommand == Command0.READ_WRITE_DEL) {
             jobExecResult.setDelReaderData(true);
         }
-        return jobExecResult;
+        return jobExecResult;*/
+        return null;
     }
-
 }

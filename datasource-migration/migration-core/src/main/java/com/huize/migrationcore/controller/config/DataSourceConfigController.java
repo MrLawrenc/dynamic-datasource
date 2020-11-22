@@ -45,6 +45,7 @@ public class DataSourceConfigController {
     @GetMapping
     @ApiOperation("获取当前所有数据源")
     public Set<String> now() {
+        System.out.println(Thread.currentThread());
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
         return ds.getCurrentDataSources().keySet();
     }
@@ -153,7 +154,7 @@ public class DataSourceConfigController {
 
         commonMapper4Mysql.streamsSelect("user", " 1=1 ", r -> {
             Map<String, Object> resultObject = r.getResultObject();
-            resultObject.put("id",maxIdx+ Integer.parseInt(resultObject.get("id").toString()));
+            resultObject.put("id", maxIdx + Integer.parseInt(resultObject.get("id").toString()));
             List<Object> row = infos.stream().map(info -> {
                 String columnName = info.getColumnName();
                 return resultObject.get(columnName);
